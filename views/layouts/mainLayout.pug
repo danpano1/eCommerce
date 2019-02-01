@@ -1,0 +1,24 @@
+head
+  meta(charset='UTF-8')
+  title #{pageTitle}
+  meta(name='viewport' content='width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0')
+  link(rel='stylesheet' href='/css/main.css')
+  link(rel="stylesheet", href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous")
+  block styles
+nav
+  .nav-bar
+    a(href='/')
+      button.nav-button(type='button' class=(pagePath==='/' ? 'active' : '')) Shop
+    a(href='/admin/addproduct')
+      button.nav-button(type='button' class=(pagePath==='/admin/addproduct' ? 'active' : '')) Add product
+    .buttonsContainer
+      a(href="")
+        button.stdButton Login
+      a(href="")
+        button.stdButton Register
+      a(href="")
+        button.stdButton(id='cart') 
+          i(class="fas fa-shopping-cart")
+          span.cartCounter 1
+main
+  block content

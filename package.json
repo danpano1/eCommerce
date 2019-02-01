@@ -1,0 +1,26 @@
+{
+  "name": "ecommerce",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danpano1/eCommerce.git"
+  },
+  "author": "Daniel Pańczyk",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/danpano1/eCommerce/issues"
+  },
+  "homepage": "https://github.com/danpano1/eCommerce#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "joi": "^14.3.1",
+    "mongoose": "^5.4.7",
+    "pug": "^2.0.3"
+  }
+}
