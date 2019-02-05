@@ -1,0 +1,17 @@
+extends layouts/mainLayout.pug
+
+block styles
+    link(rel="stylesheet", href="/css/product.css")
+    link(rel="stylesheet", href="/css/cart.css")
+block content
+    if products
+        each prod in products
+            .cartProductContainer
+                img.productImage(src=prod.imageURL, alt="")
+                p.productName #{prod.name}
+                p.productPrice #{prod.price}$
+                p.productDestription Quantity: #{prod.quantity}
+                p.productPrice Whole value: #{prod.price * prod.quantity}
+    else
+        .emptyCart 
+            p Cart is empty

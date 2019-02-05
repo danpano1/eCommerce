@@ -1,0 +1,25 @@
+.cartProductContainer{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+    height: 250px;
+    color: #fff;
+    padding: 20px;
+    background-color: #3c3c3c;
+    border-radius: 20px;
+}
+
+.emptyCart{
+    width: 200px;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+    font-size: 25px;
+    color: #fff;
+       
+}

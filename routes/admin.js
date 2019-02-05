@@ -3,6 +3,7 @@ const router = express.Router();
 const {Product, productValidation} = require('../models/Product');
 
 
+
 router.post('/addproduct', async (req, res) =>{
     
     const {error} = productValidation(req.body);
