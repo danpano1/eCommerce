@@ -4,14 +4,21 @@ block styles
     link(rel="stylesheet", href="/css/product.css")
     link(rel="stylesheet", href="/css/cart.css")
 block content
-    if products
+    if products.length
         each prod in products
             .cartProductContainer
                 img.productImage(src=prod.imageURL, alt="")
                 p.productName #{prod.name}
                 p.productPrice #{prod.price}$
                 p.productDestription Quantity: #{prod.quantity}
-                p.productPrice Whole value: #{prod.price * prod.quantity}
+                p.productPrice Whole value: #{prod.price * prod.quantity}$
+                .inc-decContainer
+                    form(action="/cart", method="post")
+                        input(type="hidden", name="productID", value=prod.id)
+                        button(type="submit").bigFontBtn +
+                    form(action="/cart", method="post")
+                        input(type="hidden", name="productIDdec", value=prod.id)
+                        button(type="submit").bigFontBtn -
     else
         .emptyCart 
             p Cart is empty

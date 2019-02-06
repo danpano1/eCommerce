@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {getRandomProducts} = require('../models/Product')
 const {Product} = require('../models/Product')
+const Cart = require('../models/Cart')
 
 
 router.get('/', async (req, res)=>{
@@ -31,27 +32,13 @@ router.get('/products/:id', async (req, res)=>{
 
 router.get('/cart', async (req, res)=>{
     const cart = req.signedCookies.cart
-    let productsToDisplay = [];
+    
 
     if(!cart) return res.render('cart')
     
-    const products = cart.items
     
-    for(let i = 0; i<products.length; i++){
-        
-        const productFromDB = await Product.findById(products[i].id);
-        
-        productsToDisplay.push({
-            id: productFromDB._id,
-            name: productFromDB.name,
-            price: productFromDB.price,
-            imageURL: productFromDB.imageURL,
-            quantity: products[i].quantity
-        });      
-
-    }       
     res.render('cart', {
-        products: productsToDisplay
+        products: await Cart.getItemsFromDB(req)
     });
     
         
@@ -60,39 +47,29 @@ router.get('/cart', async (req, res)=>{
 
 
 router.post('/cart', async (req, res)=>{
-    const productAdded = req.body.productID;
     const backURL = req.header('Referer');
     
-    if(req.signedCookies.cart){
-        let products = req.signedCookies.cart.items
-        
-        const existingProductIndex = products.findIndex((item)=>item.id === productAdded);
-        
-        if(existingProductIndex>=0) products[existingProductIndex].quantity++
+    if(req.body.productID){
+        const productAdded = req.body.productID;
+        if(req.signedCookies.cart){
 
-        else products.push({id: productAdded, quantity: 1})
-
-        res.cookie('cart', {items: products}, { signed: true, httpOnly: true}, )
-        
-
-        return res.redirect(backURL)
+            if(req.signedCookies.cart.items.find((item)=>item.id === productAdded)){
+                Cart.addQuantity(req, res, productAdded);
+            } else{
+                Cart.addProduct(req, res, productAdded);
+            }
+        } else{
+            new Cart(res, productAdded);
+        }
     }
     
-    res.cookie('cart', {
-        items: [
-            {
-                id: productAdded,
-                quantity: 1
-
-            }
-        ]
-    }, 
-    {
-        signed: true,
-        httpOnly: true
-    });
-
-    res.redirect(backURL);
+    if(req.body.productIDdec){
+        Cart.decQuantity(req, res, req.body.productIDdec)
+    }
+        
+   
+    return res.redirect(backURL);
+    
 });
 
 

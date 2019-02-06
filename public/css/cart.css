@@ -23,3 +23,20 @@
     color: #fff;
        
 }
+
+.inc-decContainer{
+    display: flex;
+    flex-direction: column;
+}
+
+.bigFontBtn{
+    font-size: 25px;
+    margin: 10px;
+    height: 40px;
+    width: 40px;
+    color: #e6e6e6;
+    outline: none;
+    border: none;
+    background-color: #44bf57;
+    border-radius: 15px;
+}
