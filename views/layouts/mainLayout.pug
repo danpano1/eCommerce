@@ -12,13 +12,14 @@ nav
     a(href='/admin/addproduct')
       button.nav-button(type='button' class=(pagePath==='/admin/addproduct' ? 'active' : '')) Add product
     .buttonsContainer
-      a(href="")
+      a(href="/login")
         button.stdButton Login
-      a(href="")
+      a(href="/register")
         button.stdButton Register
       a(href="/cart")
         button.stdButton(id='cart') 
           i(class="fas fa-shopping-cart")
-          span.cartCounter 1
+          if amountOfCartItems > 0
+            span.cartCounter #{amountOfCartItems}
 main
   block content

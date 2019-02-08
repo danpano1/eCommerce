@@ -4,8 +4,16 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const app = express();
 
-const shopRoute = require('./routes/shop');
-const adminRoute = require('./routes/admin');
+
+
+const shopRoutes = require('./controllers/routes/shop');
+const adminRoutes = require('./controllers/routes/admin');
+const authRoutes = require('./controllers/routes/auth');
+
+
+const notFound = require('./controllers/middleware/notFound');
+const locals = require('./controllers/middleware/locals');
+
 
 app.set('view engine', 'pug');
 
@@ -14,16 +22,14 @@ app.use(cookieParser('secret'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+app.use(locals);
 
-app.use('/', shopRoute);
-app.use('/admin', adminRoute);
+app.use('/', shopRoutes, authRoutes);
+app.use('/admin', adminRoutes);
 
 
-app.use((req, res)=>{
-    res.render('404', {
-        pageTitle: 'Product not found'
-    })
-})
+app.use(notFound);
+
 const port = process.env.PORT || 8080
 
 app.listen(port, ()=>{

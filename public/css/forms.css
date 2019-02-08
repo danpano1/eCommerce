@@ -11,7 +11,17 @@
 
 .formInput{
     margin: 10px;
-    width: 250px
+    width: 250px;
+    min-height: 20px;
+    border-radius: 5px;
+    border: none;
+    padding: 5px;
+    transition: background-color .5s 
+}
+
+.formInput:focus{
+    outline: none;
+    background-color: #e6e6e6
 }
 
 .errorMessage{

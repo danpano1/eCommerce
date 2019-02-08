@@ -34,6 +34,7 @@ module.exports = class Cart {
         let products = req.signedCookies.cart.items;
         const existingProductIndex = products.findIndex((item)=>item.id === product);
         products[existingProductIndex].quantity--
+        if(products[existingProductIndex].quantity === 0) products.splice(existingProductIndex, 1)
         this.sendCart(res, products);
     }
     

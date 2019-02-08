@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/danpano1/eCommerce#readme",
   "dependencies": {
+    "bcrypt": "^3.0.4",
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.4",
