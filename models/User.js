@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Joi = require('joi');
+const jwt = require('jsonwebtoken')
+
+const privateJWTkey = 'privateKey'
 
 const userSchema = new Schema({
     name:{
@@ -30,7 +33,11 @@ const userSchema = new Schema({
     },
     streetAdress:{
         type: String,
-    }
+    },
+    isAdmin:{
+        type: Boolean,
+        default: false
+    },
 
 });
 
@@ -51,5 +58,35 @@ const userValidation = (user)=>{
 
 }
 
+const setUserCookie = async (res, user, cb) =>{
+    
+    jwt.sign({
+        id: user._id,
+        isAdmin: user.isAdmin
+    }, privateJWTkey, {
+        expiresIn: '1h'
+    }, (err, userToken) =>{
+        if (err) return res.status(500)
+        
+        res.cookie('user', userToken, {
+            expires: new Date(Date.now() + 3600000),
+        });
+        cb();
+    })
+}
+
+const verifyUserToken = (token, cb) =>{
+    jwt.verify(token, privateJWTkey, (err, userEncrypted)=>{
+        
+        let user = false
+        
+        if (!err) user = userEncrypted
+        
+        cb(user)
+    })
+}
+
 module.exports.User = User;
 module.exports.userValidation = userValidation;
+module.exports.setUserCookie = setUserCookie;
+module.exports.verifyUserToken = verifyUserToken;

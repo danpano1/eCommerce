@@ -1,15 +1,14 @@
-extends layouts/mainLayout.pug   
+extends ../layouts/mainLayout.pug
 
 block styles
     link(rel="stylesheet", href="/css/product.css")
-    link(rel="stylesheet", href="/css/productSent.css")
 block content
-    a(href='/admin/addproduct')
-        button.addAnother Add another       
     .productContainer
         img.productImage(src=img alt='')
         .aboutProducts
-            p.productName #{name}
+            p.productName #{pname}
             p.productPrice #{price}$
             p.productDestription #{description}
-
+            form(action="/cart", method="post")
+                input(type="hidden", name="productID", value=id)
+                button(type="submit").stdButton Add to cart

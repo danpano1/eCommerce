@@ -1,17 +1,37 @@
 const express = require('express');
 const router = express.Router();
-const {User, userValidation} = require('../../models/User')
+const {User, userValidation, setUserCookie} = require('../../models/User')
 const bcrypt = require('bcrypt');
 
 
 router.get('/login', (req, res)=>{
-    res.render('login', {
+    res.render('auth/login', {
         pageTitle: 'Login'
     });
 });
 
+
+router.post('/login', async (req, res)=>{
+    
+    const user = await User.findOne({email: req.body.email})
+    
+    if (!user) return res.status(400).render('auth/login', {
+        err: 'Email or password are not correct'
+    });
+
+    const isPasswordCorrect = await bcrypt.compare(req.body.password, user.password)
+    
+    if(!isPasswordCorrect) return res.status(400).render('auth/login', {
+        err: 'Email or password are not correct'
+    });
+
+    setUserCookie(res, user, ()=>{
+        res.redirect('/');
+    })
+});
+
 router.get('/register', (req, res)=>{
-    res.render('register', {
+    res.render('auth/register', {
         pageTitle: 'Register',
     });
 })
@@ -20,17 +40,14 @@ router.post('/register', async (req, res)=>{
     
     const {error} = userValidation(req.body);
     
-    const joiLikeErrors = [];
+    let joiLikeErrors = [];
 
 
-    if(error) error.details.forEach((detail)=>{
-        joiLikeErrors.push(detail)
-    })
+    if(error) joiLikeErrors = (error.details)
 
     if(req.body.password !== req.body.confirmPassword) joiLikeErrors.push({message: 'Passwords do not match'})
 
-    console.log(joiLikeErrors)
-    if (joiLikeErrors.length > 0) return res.status(400).render('register', {
+    if (joiLikeErrors.length > 0) return res.status(400).render('auth/register', {
         pageTitle: 'Register',
         errs: joiLikeErrors
     })
@@ -38,7 +55,7 @@ router.post('/register', async (req, res)=>{
 
     if(await User.findOne({email:req.body.email})) {
         joiLikeErrors.push({message: 'Email already in use'})
-        return res.status(400).render('register', {
+        return res.status(400).render('auth/register', {
             pageTitle: 'Register',
             errs: joiLikeErrors
         })
@@ -59,6 +76,14 @@ router.post('/register', async (req, res)=>{
     res.redirect('/');
     
 })
+
+router.post('/logout', (req, res) =>{
+    if(req.cookies.user){
+        res.clearCookie('user')
+    }
+    res.redirect('/')
+})
+
 
 
 module.exports = router

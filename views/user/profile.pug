@@ -1,0 +1,12 @@
+extends ../layouts/mainLayout.pug
+block styles
+    link(rel="stylesheet", href="/css/product.css")
+    link(rel="stylesheet", href="/css/user.css")
+block content
+    .userInfoContainer
+        h4 Full Name
+        p.userInfo #{info.fullName}
+        h4 E-mail 
+        p.userInfo #{info.email}
+        button.stdButton Change password
+           

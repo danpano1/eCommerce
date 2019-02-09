@@ -9,7 +9,7 @@ router.get('/', async (req, res)=>{
 
     const productsToShow = await getRandomProducts(6);
     
-    res.render('shopIndex', {
+    res.render('shop/shopIndex', {
         products: productsToShow,
         pagePath: '/',
         pageTitle: 'eCommerce'
@@ -19,7 +19,7 @@ router.get('/', async (req, res)=>{
 
 router.get('/products/:id', async (req, res)=>{
     const product = await Product.findById(req.params.id);
-    res.render('productPage', {
+    res.render('shop/productPage', {
         img: product.imageURL,
         name: product.name,
         price: product.price,
@@ -34,10 +34,10 @@ router.get('/cart', async (req, res)=>{
     const cart = req.signedCookies.cart
     
 
-    if(!cart) return res.render('cart')
+    if(!cart) return res.render('shop/cart')
     
     
-    res.render('cart', {
+    res.render('shop/cart', {
         products: await Cart.getItemsFromDB(req)
     });
     

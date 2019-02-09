@@ -11,11 +11,20 @@ nav
       button.nav-button(type='button' class=(pagePath==='/' ? 'active' : '')) Shop
     a(href='/admin/addproduct')
       button.nav-button(type='button' class=(pagePath==='/admin/addproduct' ? 'active' : '')) Add product
+    if isLoggedIn
+      a(href='/orders')
+        button.nav-button(type='button' class=(pagePath==='/orders' ? 'active' : '')) Orders
     .buttonsContainer
-      a(href="/login")
-        button.stdButton Login
-      a(href="/register")
-        button.stdButton Register
+      if !isLoggedIn
+        a(href="/login")
+          button.stdButton Login
+        a(href="/register")
+          button.stdButton Register
+      else
+        a(href="/profile")
+          button.stdButton Profile
+        form(action="/logout", method="post")
+          button.stdButton(type="submit") Logout        
       a(href="/cart")
         button.stdButton(id='cart') 
           i(class="fas fa-shopping-cart")

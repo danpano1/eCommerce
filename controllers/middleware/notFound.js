@@ -1,6 +1,6 @@
 module.exports= (req, res) => {
-    res.render('404', {
-        pageTitle: 'Product not found'
+    res.render('errors/404', {
+        pageTitle: 'Page not found'
     })
 }
 

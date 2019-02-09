@@ -9,13 +9,13 @@ router.post('/addproduct', async (req, res) =>{
     const {error} = productValidation(req.body);
     const joiLikeErrors = [];
 
-    if(error) return res.status(400).render('addProduct', {
+    if(error) return res.status(400).render('admin/addProduct', {
         pagePath: '/admin/addproduct',
         pageTitle: 'Add product',
         errs: error.details
     });
 
-    if(await Product.findOne({name:req.body.name})) return res.status(400).render('addProduct', {
+    if(await Product.findOne({name:req.body.name})) return res.status(400).render('admin/addProduct', {
         pagePath: '/admin/addproduct',
         pageTitle: 'Add product',
         errs: ['Product already exist']
@@ -31,7 +31,7 @@ router.post('/addproduct', async (req, res) =>{
 
     await newProduct.save();
 
-    res.render('productSent', {
+    res.render('admin/productSent', {
         pagePath: '/admin/addproduct',
         pageTitle: 'Added product',
         name: newProduct.name,
@@ -44,7 +44,7 @@ router.post('/addproduct', async (req, res) =>{
 });
 
 router.get('/addproduct', (req, res)=>{
-    res.render('addProduct', {
+    res.render('admin/addProduct', {
         pagePath: '/admin/addproduct',
         pageTitle: 'Add product'
     });

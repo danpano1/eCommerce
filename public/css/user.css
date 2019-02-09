@@ -1,0 +1,17 @@
+.userInfoContainer{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 35%;
+    color: #fff;
+    padding: 20px;
+    background-color: #3c3c3c;
+    border-radius: 20px;
+}
+.userInfo{
+    margin: 10px;
+}
