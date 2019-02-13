@@ -2,16 +2,17 @@ const express = require('express');
 const router = express.Router();
 const {User, userValidation, setUserCookie} = require('../../models/User')
 const bcrypt = require('bcrypt');
+const errorHandler = require('../middleware/errorHandler');
 
 
-router.get('/login', (req, res)=>{
+router.get('/login', errorHandler((req, res)=>{
     res.render('auth/login', {
         pageTitle: 'Login'
     });
-});
+}));
 
 
-router.post('/login', async (req, res)=>{
+router.post('/login', errorHandler(async (req, res)=>{
     
     const user = await User.findOne({email: req.body.email})
     
@@ -28,15 +29,15 @@ router.post('/login', async (req, res)=>{
     setUserCookie(res, user, ()=>{
         res.redirect('/');
     })
-});
+}));
 
-router.get('/register', (req, res)=>{
+router.get('/register', errorHandler((req, res)=>{
     res.render('auth/register', {
         pageTitle: 'Register',
     });
-})
+}))
 
-router.post('/register', async (req, res)=>{
+router.post('/register', errorHandler(async (req, res)=>{
     
     const {error} = userValidation(req.body);
     
@@ -75,14 +76,14 @@ router.post('/register', async (req, res)=>{
 
     res.redirect('/');
     
-})
+}))
 
-router.post('/logout', (req, res) =>{
+router.post('/logout', errorHandler((req, res) =>{
     if(req.cookies.user){
         res.clearCookie('user')
     }
     res.redirect('/')
-})
+}));
 
 
 

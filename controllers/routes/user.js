@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const {User, verifyUserToken} = require('../../models/User')
-const jwt = require('jsonwebtoken')
+const errorHandler = require('../middleware/errorHandler');
 
 router.get('/orders', (req, res)=>{
 
 })
 
-router.get('/profile', async (req, res)=>{
+router.get('/profile', errorHandler(async (req, res)=>{
     const userToken = req.cookies.user
 
     verifyUserToken(userToken, async (user)=>{
@@ -25,6 +25,6 @@ router.get('/profile', async (req, res)=>{
         
     })
     
-})
+}));
 
 module.exports = router

@@ -3,10 +3,11 @@ const router = express.Router();
 const {getRandomProducts} = require('../../models/Product')
 const {Product} = require('../../models/Product')
 const Cart = require('../../models/Cart')
+const errorHandler = require('../middleware/errorHandler');
 
 
-router.get('/', async (req, res)=>{
-
+router.get('/', errorHandler(async (req, res)=>{
+    
     const productsToShow = await getRandomProducts(6);
     
     res.render('shop/shopIndex', {
@@ -15,9 +16,9 @@ router.get('/', async (req, res)=>{
         pageTitle: 'eCommerce'
     })
     
-});
+}));
 
-router.get('/products/:id', async (req, res)=>{
+router.get('/products/:id', errorHandler(async (req, res)=>{
     const product = await Product.findById(req.params.id);
     res.render('shop/productPage', {
         img: product.imageURL,
@@ -28,9 +29,9 @@ router.get('/products/:id', async (req, res)=>{
         pagePath: '/',
         pageTitle: product.name
     })
-})
+}))
 
-router.get('/cart', async (req, res)=>{
+router.get('/cart', errorHandler(async (req, res)=>{
     const cart = req.signedCookies.cart
     
 
@@ -42,11 +43,11 @@ router.get('/cart', async (req, res)=>{
     });
     
         
-})
+}));
 
 
 
-router.post('/cart', async (req, res)=>{
+router.post('/cart', errorHandler(async (req, res)=>{
     const backURL = req.header('Referer');
     
     if(req.body.productID){
@@ -70,7 +71,7 @@ router.post('/cart', async (req, res)=>{
    
     return res.redirect(backURL);
     
-});
+}));
 
 
 

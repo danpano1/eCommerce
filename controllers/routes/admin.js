@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const {Product, productValidation} = require('../../models/Product');
+const errorHandler = require('../middleware/errorHandler');
 
 
 
-router.post('/addproduct', async (req, res) =>{
+router.post('/addproduct', errorHandler(async (req, res) =>{
+      const {error} = productValidation(req.body);
     
-    const {error} = productValidation(req.body);
-    const joiLikeErrors = [];
-
     if(error) return res.status(400).render('admin/addProduct', {
         pagePath: '/admin/addproduct',
         pageTitle: 'Add product',
@@ -41,13 +40,13 @@ router.post('/addproduct', async (req, res) =>{
     })
 
  
-});
+}));
 
-router.get('/addproduct', (req, res)=>{
+router.get('/addproduct', errorHandler((req, res)=>{
     res.render('admin/addProduct', {
         pagePath: '/admin/addproduct',
         pageTitle: 'Add product'
     });
-})
+}))
 
 module.exports = router;

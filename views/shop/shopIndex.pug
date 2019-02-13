@@ -14,6 +14,7 @@ block content
                     p.productDestription #{prod.description}
                     form(action="/cart", method="post")
                         input(type="hidden", name="productID", value=prod.id)
+                        input(type="hidden", name="_csrf", value=csrfToken)
                         button(type="submit").stdButton Add to cart
                         a(href="/products/"+prod.id)
                             button(type="button").stdButton Show details

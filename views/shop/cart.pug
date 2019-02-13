@@ -14,9 +14,11 @@ block content
                 .inc-decContainer
                     form(action="/cart", method="post")
                         input(type="hidden", name="productID", value=prod.id)
+                        input(type="hidden", name="_csrf", value=csrfToken)
                         button(type="submit").bigFontBtn +
                     form(action="/cart", method="post")
                         input(type="hidden", name="productIDdec", value=prod.id)
+                        input(type="hidden", name="_csrf", value=csrfToken)
                         button(type="submit").bigFontBtn -
     if !products || products.length <= 0
         .emptyCart 

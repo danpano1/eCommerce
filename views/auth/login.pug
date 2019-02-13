@@ -8,6 +8,7 @@ block content
             input.formInput(type='text' name='email')
             label(for='password') Password
             input.formInput(type='password' name='password')
+            input(type="hidden", name="_csrf", value=csrfToken)
             if err
                 .errorMessage
                     p #{err}

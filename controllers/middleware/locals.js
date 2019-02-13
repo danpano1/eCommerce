@@ -1,6 +1,7 @@
 module.exports = (req, res, next)=>{
     res.locals.amountOfCartItems = 0;
     res.locals.isLoggedIn = false;
+    res.locals.csrfToken = req.csrfToken();
 
     if(req.signedCookies.cart){
         const itemsInCart = req.signedCookies.cart.items
