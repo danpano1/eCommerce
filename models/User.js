@@ -24,15 +24,19 @@ const userSchema = new Schema({
     },
     country:{
         type: String,
+        default: ""
     },
     city:{
         type: String,
+        default: ""
     },
     postCode:{
         type: String,
+        default: ""
     },
     streetAdress:{
         type: String,
+        default: ""
     },
     isAdmin:{
         type: Boolean,
@@ -45,11 +49,19 @@ const User = mongoose.model('User', userSchema);
 
 const userValidation = (user)=>{
     const schema = {
-        name: Joi.string().min(3).required(),
-        surname: Joi.string().min(3).required(),
-        email: Joi.string().email().required(),
-        password: Joi.string().min(5).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]/).required(),
-        confirmPassword: Joi.string()
+        name: Joi.string().trim().min(3).max(12).required(),
+        surname: Joi.string().trim().min(3).max(12).required(),
+        email: Joi.string().trim().email().lowercase().required(),
+        password: Joi.string().trim().min(5).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]/).error((errs)=>{
+            return(errs.map((err)=>{
+                if (err.type === 'string.regex.base')
+                return {message : '"password" must contain at least 5 characters including one: number, big and small letter'}
+            else
+                return {message : '"password" is reqruired and must be a string'};
+            }))
+        }).required(),        
+        confirmPassword: Joi.string().trim(),
+        _csrf: Joi.required(),
                    
     }
     return Joi.validate(user , schema, {

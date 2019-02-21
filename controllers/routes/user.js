@@ -3,10 +3,6 @@ const router = express.Router();
 const {User, verifyUserToken} = require('../../models/User')
 const errorHandler = require('../middleware/errorHandler');
 
-router.get('/orders', (req, res)=>{
-
-})
-
 router.get('/profile', errorHandler(async (req, res)=>{
     const userToken = req.cookies.user
 
@@ -20,7 +16,8 @@ router.get('/profile', errorHandler(async (req, res)=>{
     }
 
     res.render('user/profile', {
-        info: infoToSend
+        info: infoToSend,
+        pageTitle: `${infoToSend.fullName}`
     })
         
     })

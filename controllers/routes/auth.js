@@ -6,6 +6,9 @@ const errorHandler = require('../middleware/errorHandler');
 
 
 router.get('/login', errorHandler((req, res)=>{
+
+   if (req.cookies.user) return res.redirect('/')
+   
     res.render('auth/login', {
         pageTitle: 'Login'
     });
@@ -16,14 +19,16 @@ router.post('/login', errorHandler(async (req, res)=>{
     
     const user = await User.findOne({email: req.body.email})
     
-    if (!user) return res.status(400).render('auth/login', {
-        err: 'Email or password are not correct'
+    if (!user) return res.status(422).render('auth/login', {
+        err: 'Email or password are not correct',
+        pageTitle: 'Login'
     });
 
     const isPasswordCorrect = await bcrypt.compare(req.body.password, user.password)
     
-    if(!isPasswordCorrect) return res.status(400).render('auth/login', {
-        err: 'Email or password are not correct'
+    if(!isPasswordCorrect) return res.status(422).render('auth/login', {
+        err: 'Email or password are not correct',
+        pageTitle: 'Login'
     });
 
     setUserCookie(res, user, ()=>{
@@ -32,6 +37,9 @@ router.post('/login', errorHandler(async (req, res)=>{
 }));
 
 router.get('/register', errorHandler((req, res)=>{
+
+    if (req.cookies.user) return res.redirect('/')
+
     res.render('auth/register', {
         pageTitle: 'Register',
     });
@@ -48,7 +56,7 @@ router.post('/register', errorHandler(async (req, res)=>{
 
     if(req.body.password !== req.body.confirmPassword) joiLikeErrors.push({message: 'Passwords do not match'})
 
-    if (joiLikeErrors.length > 0) return res.status(400).render('auth/register', {
+    if (joiLikeErrors.length > 0) return res.status(422).render('auth/register', {
         pageTitle: 'Register',
         errs: joiLikeErrors
     })
@@ -74,7 +82,7 @@ router.post('/register', errorHandler(async (req, res)=>{
 
     await newUser.save();
 
-    res.redirect('/');
+    res.redirect('/login');
     
 }))
 

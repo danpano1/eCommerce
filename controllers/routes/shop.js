@@ -4,6 +4,7 @@ const {getRandomProducts} = require('../../models/Product')
 const {Product} = require('../../models/Product')
 const Cart = require('../../models/Cart')
 const errorHandler = require('../middleware/errorHandler');
+const {User, verifyUserToken} = require('../../models/User')
 
 
 router.get('/', errorHandler(async (req, res)=>{
@@ -72,6 +73,45 @@ router.post('/cart', errorHandler(async (req, res)=>{
     return res.redirect(backURL);
     
 }));
+
+router.get('/orderdata', errorHandler(async (req, res, next)=>{
+
+    if(!req.signedCookies.cart) return res.redirect('/cart')
+
+    const products = await Cart.getItemsFromDB(req);
+    const wholePrice = Cart.countWholePrice(products)
+    
+    if (req.cookies.user){
+        verifyUserToken(req.cookies.user, async (user)=>{
+            
+            if(!user) return res.status(401).send('Bad token')
+
+            const userInfo = await User.findById(user.id);
+            const {name, surname, email, country, city, postCode, streetAdress} = userInfo;
+            res.render('shop/orderData', {
+                pageTitle: "Order data",
+                name: name,
+                surname: surname,
+                email: email,
+                country: country,
+                city: city,
+                postCode: postCode,
+                streetAdress, streetAdress,
+                userId: userInfo._id,
+                products: products,
+                wholePrice: wholePrice
+            })
+        })
+    } else {
+        res.render('shop/orderData', {
+            pageTitle: "Order data",
+            products: products,
+            wholePrice: wholePrice
+        })
+    }
+
+
+}))
 
 
 

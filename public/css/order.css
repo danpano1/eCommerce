@@ -1,0 +1,48 @@
+.orderProductContainer{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+    height: 50px;
+    color: #e6e6e6;
+    padding: 5px;
+    background-color: #3c3c3c;
+    border-radius: 20px;
+}
+.orderProductImage {
+    margin:5px;
+    width: 60px;
+    height: 40px;
+    object-position: center;
+    border-radius: 10%;
+}
+
+.orderProductData{
+    font-size: 18px;
+    font-weight: 700;
+    width: 100px;
+}
+
+.wholeValueContainer{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+    height: 50px;
+    color: #e6e6e6;
+    padding: 5px;
+    background-color: #2e2e2e;
+    border-radius: 20px;
+}
+
+.wholeValueData{
+    font-size: 20px;
+    font-weight: 700;
+    margin: 10px;
+}

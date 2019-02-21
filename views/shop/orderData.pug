@@ -1,0 +1,38 @@
+extends ../layouts/mainLayout.pug
+block styles
+    link(rel="stylesheet", href="/css/forms.css")    
+    link(rel="stylesheet", href="/css/order.css")
+block content
+    form.formContainer(action='/orderdata' method='post')    
+        if products
+            each prod in products
+                .orderProductContainer
+                    input(type="hidden", name="productId", value=prod.id)
+                    img.orderProductImage(src=prod.imageURL, alt="")
+                    p.orderProductData #{prod.name}
+                    p.orderProductData #{prod.price}$
+                    p.orderProductData Quantity: #{prod.quantity}
+                    input(type="hidden", name="productQuantity", value=prod.quantity)
+            .wholeValueContainer
+                p.wholeValueData Whole price
+                p.wholeValueData #{wholePrice}$
+        .formContainer                
+            label(for='name') First Name
+            input.formInput(type='text' name='name' value=name)
+            label(for='surname') Second Name
+            input.formInput(type='text' name='surname' value=surname)
+            label(for='email') E-mail
+            input.formInput(type='text' name='email' value=email)
+            label(for='country') Country
+            input.formInput(type='text' name='country' value=country)
+            label(for='postCode') Post Code
+            input.formInput(type='text' name='postCode' value=postCode)
+            label(for='streetAdress') Street adress
+            input.formInput(type='text' name='streetAdress' value=streetAdress)
+            input(type="hidden", name="userId", value=userId)
+            input(type="hidden", name="_csrf", value=csrfToken)
+            if errs
+                .errorMessage
+                each err in errs
+                    p #{err.message}
+            button.stdButton(type='submit') Accept 

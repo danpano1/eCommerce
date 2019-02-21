@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-var csurf = require('csurf')
+const csurf = require('csurf')
 
 const shopRoutes = require('./controllers/routes/shop');
 const adminRoutes = require('./controllers/routes/admin');

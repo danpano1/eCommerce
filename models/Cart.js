@@ -67,4 +67,14 @@ module.exports = class Cart {
         
         return productsToDisplay
     }
+
+    static countWholePrice (products){
+        let wholePrice = 0;
+
+        products.forEach((prod)=>{
+            wholePrice += prod.price*prod.quantity
+            
+        })
+        return wholePrice
+    }
 }

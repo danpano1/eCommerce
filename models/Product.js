@@ -32,10 +32,11 @@ const productValidation = (product) => {
     
     
     const schema = {
-        name: Joi.string().min(5).required(),
-        price: Joi.number().required(),
+        name: Joi.string().min(5).trim().required(),
+        price: Joi.number().trim().required(),
         imageURL: Joi.string().
-                    regex(/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/).
+                    trim().
+                    regex(/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/).                    
                     required().
                     error((errs)=> {
                         return errs.map(err => {
@@ -46,8 +47,9 @@ const productValidation = (product) => {
                         });
                     }),
 
-        description: Joi.string().min(10).required(),
-        quantity: Joi.number().required()
+        description: Joi.string().trim().min(10).required(),
+        quantity: Joi.number().trim().required(),
+        _csrf: Joi.required(),
     }
     const result = Joi.validate(product, schema, {
         abortEarly: false

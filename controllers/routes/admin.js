@@ -8,13 +8,13 @@ const errorHandler = require('../middleware/errorHandler');
 router.post('/addproduct', errorHandler(async (req, res) =>{
       const {error} = productValidation(req.body);
     
-    if(error) return res.status(400).render('admin/addProduct', {
+    if(error) return res.status(422).render('admin/addProduct', {
         pagePath: '/admin/addproduct',
         pageTitle: 'Add product',
         errs: error.details
     });
 
-    if(await Product.findOne({name:req.body.name})) return res.status(400).render('admin/addProduct', {
+    if(await Product.findOne({name:req.body.name})) return res.status(422).render('admin/addProduct', {
         pagePath: '/admin/addproduct',
         pageTitle: 'Add product',
         errs: ['Product already exist']
