@@ -3,7 +3,7 @@ block styles
     link(rel="stylesheet", href="/css/forms.css")    
     link(rel="stylesheet", href="/css/order.css")
 block content
-    form.formContainer(action='/orderdata' method='post')    
+    form.formContainer(action='/ordering' method='post')    
         if products
             each prod in products
                 .orderProductContainer
@@ -33,6 +33,6 @@ block content
             input(type="hidden", name="_csrf", value=csrfToken)
             if errs
                 .errorMessage
-                each err in errs
-                    p #{err.message}
+                    each err in errs
+                        p #{err.message}
             button.stdButton(type='submit') Accept 

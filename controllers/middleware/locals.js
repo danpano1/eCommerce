@@ -5,7 +5,6 @@ module.exports = (req, res, next)=>{
 
     if(req.signedCookies.cart){
         const itemsInCart = req.signedCookies.cart.items
-        res.locals.amountOfCartItems = 0;
         itemsInCart.forEach((item)=>{
             res.locals.amountOfCartItems+=item.quantity
         })

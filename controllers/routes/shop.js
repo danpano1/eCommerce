@@ -5,6 +5,7 @@ const {Product} = require('../../models/Product')
 const Cart = require('../../models/Cart')
 const errorHandler = require('../middleware/errorHandler');
 const {User, verifyUserToken} = require('../../models/User')
+const {Order, orderValidation} = require('../../models/Order')
 
 
 router.get('/', errorHandler(async (req, res)=>{
@@ -18,6 +19,7 @@ router.get('/', errorHandler(async (req, res)=>{
     })
     
 }));
+
 
 router.get('/products/:id', errorHandler(async (req, res)=>{
     const product = await Product.findById(req.params.id);
@@ -74,12 +76,13 @@ router.post('/cart', errorHandler(async (req, res)=>{
     
 }));
 
-router.get('/orderdata', errorHandler(async (req, res, next)=>{
+router.get('/ordering', errorHandler(async (req, res)=>{
 
     if(!req.signedCookies.cart) return res.redirect('/cart')
 
     const products = await Cart.getItemsFromDB(req);
     const wholePrice = Cart.countWholePrice(products)
+    const validationErr = req.cookies.error
     
     if (req.cookies.user){
         verifyUserToken(req.cookies.user, async (user)=>{
@@ -87,8 +90,9 @@ router.get('/orderdata', errorHandler(async (req, res, next)=>{
             if(!user) return res.status(401).send('Bad token')
 
             const userInfo = await User.findById(user.id);
+
             const {name, surname, email, country, city, postCode, streetAdress} = userInfo;
-            res.render('shop/orderData', {
+            res.render('shop/ordering', {
                 pageTitle: "Order data",
                 name: name,
                 surname: surname,
@@ -99,18 +103,81 @@ router.get('/orderdata', errorHandler(async (req, res, next)=>{
                 streetAdress, streetAdress,
                 userId: userInfo._id,
                 products: products,
-                wholePrice: wholePrice
+                wholePrice: wholePrice,
+                errs: validationErr
             })
         })
     } else {
-        res.render('shop/orderData', {
+        res.render('shop/ordering', {
             pageTitle: "Order data",
             products: products,
-            wholePrice: wholePrice
+            wholePrice: wholePrice,
+            errs: validationErr
         })
     }
 
 
+}))
+
+router.post('/ordering', errorHandler(async (req, res)=>{
+    let products = [];
+    let userId = "";
+    
+    if(typeof req.body.productId === "string") 
+    {
+        products.push({
+            productId: req.body.productId,
+            productQuantity: req.body.productQuantity
+        })
+    } else {
+        for(let i=0; i<req.body.productId.length; i++){
+            
+            products.push( {
+                productId: req.body.productId[i],
+                productQuantity: req.body.productQuantity[i]
+            })
+        }        
+    }      
+    
+    verifyUserToken(req.cookies.user, async (user)=>{
+        if(user) userId = user
+
+        const order = {
+            products: products,
+            name: req.body.name,
+            surname: req.body.surname,
+            email: req.body.email,
+            country: req.body.country,
+            postCode: req.body.postCode,
+            streetAdress: req.body.streetAdress,
+            userId: userId
+        }
+        
+        const {error} = orderValidation(order)
+
+        if (error) {
+            const errors = []
+           
+            error.details.forEach((err)=>{
+                errors.push({message: err.message})
+            })                       
+            
+            res.cookie('error', errors, {
+                maxAge: 2000
+            })
+            return res.redirect('/ordering')
+        }
+      
+        const newOrder = new Order(order);
+
+        await newOrder.save();
+
+        res.clearCookie('cart');
+
+        res.render('shop/ordered', {
+            pageTitle: 'Ordered',            
+        })
+    })
 }))
 
 
