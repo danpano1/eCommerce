@@ -5,7 +5,7 @@ const {Product} = require('../../models/Product')
 const Cart = require('../../models/Cart')
 const errorHandler = require('../middleware/errorHandler');
 const {User, verifyUserToken} = require('../../models/User')
-const {Order, orderValidation} = require('../../models/Order')
+const {Order, orderValidation, createOrderToken, verifyOrderToken} = require('../../models/Order')
 
 
 router.get('/', errorHandler(async (req, res)=>{
@@ -119,7 +119,7 @@ router.get('/ordering', errorHandler(async (req, res)=>{
 
 }))
 
-router.post('/ordering', errorHandler(async (req, res)=>{
+router.post('/ordering', errorHandler(async (req, res, next)=>{
     let products = [];
     let userId = "";
     
@@ -172,25 +172,72 @@ router.post('/ordering', errorHandler(async (req, res)=>{
             })
             return res.redirect('/ordering')
         }
-        
-        userFromDB.country = req.body.country
-        userFromDB.postCode = req.body.postCode
-        userFromDB.streetAdress = req.body.streetAdress
 
-        userFromDB.save();
+        if(userFromDB) {
+            userFromDB.country = req.body.country
+            userFromDB.postCode = req.body.postCode
+            userFromDB.streetAdress = req.body.streetAdress
+
+            userFromDB.save();
+        }
+        
 
         const newOrder = new Order(order);
 
         await newOrder.save();
 
         res.clearCookie('cart');
+        
+        createOrderToken(newOrder._id, (err, orderToken)=>{
+            
+            if(err) return next(err);
 
-        res.render('shop/ordered', {
-            pageTitle: 'Ordered',            
+            res.redirect(`/orders/${orderToken}`);
         })
-    })
+    })  
 }))
 
+router.get('/orders/:orderToken', async (req, res) => {
+    const orderToken = req.params.orderToken;
+
+    verifyOrderToken(orderToken, async (orderEncrypted)=>{
+
+        if (!orderEncrypted) return res.status(400).send('Bad token')
+        
+        const orderFromDb = await Order.findById(orderEncrypted.orderId);
+
+        let products = [];
+        let wholeValue = 0;
+        
+        for(let i = 0; i<orderFromDb.products.length; i++){
+            const product = await Product.findById(orderFromDb.products[i].productId)
+
+            products.push({
+                imageURL: product.imageURL,
+                name: product.name,
+                price: product.price,
+                quantity: orderFromDb.products[i].productQuantity,
+            })      
+            wholeValue += orderFromDb.products[i].productQuantity * product.price
+        }
+
+        const order = {
+            orderDate: orderFromDb.orderDate,
+            name: orderFromDb.name,
+            surname: orderFromDb.surname,
+            email: orderFromDb.email,
+            postCode: orderFromDb.postCode,
+            streetAdress: orderFromDb.streetAdress,
+            country: orderFromDb.country,
+            products: products,
+            wholePrice: wholeValue
+        }
+
+        res.render('shop/order', {
+            order: order
+        })
+    })
+})
 
 
 module.exports = router;

@@ -77,8 +77,9 @@ const setUserCookie = async (res, user, cb) =>{
         isAdmin: user.isAdmin
     }, privateJWTkey, {
         expiresIn: '1h'
-    }, (err, userToken) =>{
-        if (err) return res.status(500)
+    }, (err, userToken) =>{        
+
+        if (err) return cb(err)
         
         res.cookie('user', userToken, {
             expires: new Date(Date.now() + 3600000),
@@ -87,7 +88,7 @@ const setUserCookie = async (res, user, cb) =>{
     })
 }
 
-const verifyUserToken = (token, cb) =>{
+const verifyUserToken = async (token, cb) =>{
     jwt.verify(token, privateJWTkey, (err, userEncrypted)=>{
         
         let user = false

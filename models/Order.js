@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Joi = require('joi');
+const jwt = require('jsonwebtoken');
+
+const privateJWTkey = 'privateKey'
 
 const orderSchema = new Schema({
     products:{
@@ -74,5 +77,25 @@ const orderValidation = (order) => {
     return result
 }
 
-module.exports.Order = Order
-module.exports.orderValidation = orderValidation
+const createOrderToken = (orderId, cb)=>{
+    jwt.sign({orderId: orderId}, privateJWTkey, (err, orderToken)=>{
+
+        cb(err, orderToken);
+    })
+}
+
+const verifyOrderToken = (orderToken, cb)=>{
+    jwt.verify(orderToken, privateJWTkey, (err, orderEncrypted)=>{
+
+        let order = false;
+
+        if(!err) order = orderEncrypted;
+
+        cb(order);
+    })
+}
+
+module.exports.Order = Order;
+module.exports.orderValidation = orderValidation;
+module.exports.createOrderToken = createOrderToken;
+module.exports.verifyOrderToken = verifyOrderToken;

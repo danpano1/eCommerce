@@ -31,7 +31,10 @@ router.post('/login', errorHandler(async (req, res)=>{
         pageTitle: 'Login'
     });
 
-    setUserCookie(res, user, ()=>{
+    setUserCookie(res, user, (err)=>{
+
+        if(err) next(err);
+        
         res.redirect('/');
     })
 }));

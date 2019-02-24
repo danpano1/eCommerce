@@ -16,8 +16,7 @@ block content
                                 img.orderProductImage(src=prod.imageURL, alt="")
                                 p.orderProductData #{prod.name}
                                 p.orderProductData #{prod.price}$
-                                p.orderProductData Quantity: #{prod.quantity}
-                                input(type="hidden", name="productQuantity", value=prod.quantity)
+                                p.orderProductData Quantity: #{prod.quantity}                                
                         .wholeValueContainer
                             p.wholeValueData Whole price
                             p.wholeValueData #{order.wholePrice}$
