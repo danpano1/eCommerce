@@ -3,7 +3,16 @@
     padding: 0;
     box-sizing: border-box;
 }
-
+html{
+    font-family: Oswald;
+    letter-spacing: .2px;
+    color: #ebe7e7;
+}
+button{
+    font-family: Oswald;
+    letter-spacing: .2px;
+    color: #ebe7e7;
+}
 body{
     background-color: #4c4c4c;
     width: 100vw;
@@ -23,7 +32,7 @@ body{
     margin-left: 5px;
     background: none;
     border: none;
-    color: #e6e6e6;
+    
     transition: background-color .5s;
 }
 
@@ -41,7 +50,6 @@ body{
     margin: 10px;
     height: 40px;
     width: 90px;
-    color: #e6e6e6;
     outline: none;
     border: none;
     background-color: #44bf57;

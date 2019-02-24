@@ -140,7 +140,12 @@ router.post('/ordering', errorHandler(async (req, res)=>{
     }      
     
     verifyUserToken(req.cookies.user, async (user)=>{
-        if(user) userId = user
+        let userFromDB = null;
+
+        if(user){
+        userId = user.id
+        userFromDB = await User.findById(userId)
+        }       
 
         const order = {
             products: products,
@@ -167,7 +172,13 @@ router.post('/ordering', errorHandler(async (req, res)=>{
             })
             return res.redirect('/ordering')
         }
-      
+        
+        userFromDB.country = req.body.country
+        userFromDB.postCode = req.body.postCode
+        userFromDB.streetAdress = req.body.streetAdress
+
+        userFromDB.save();
+
         const newOrder = new Order(order);
 
         await newOrder.save();

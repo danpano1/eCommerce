@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const Joi = require('joi');
 
 const orderSchema = new Schema({
-    porducts:{
+    products:{
         type: Array,
         required: true
     },
@@ -12,7 +12,7 @@ const orderSchema = new Schema({
     },
     orderDate: {
         type: Date,
-        default: new Date()
+        default: Date.now
     },
     isSent: {
         type: Boolean,
@@ -20,7 +20,32 @@ const orderSchema = new Schema({
     },
     sendDate: {
         type: Date
-    }
+    },
+    name:{
+        type: String,
+        required: true
+    },
+    surname:{
+        type: String,
+        required: true
+    },
+    email:{
+        type: String,
+        required: true
+    },
+    country:{
+        type: String,
+        required: true
+    },
+    postCode:{
+        type: String,
+        required: true
+    },   
+    streetAdress:{
+        type: String,
+        required: true
+    },
+
 })
 
 const Order = mongoose.model('Order', orderSchema);

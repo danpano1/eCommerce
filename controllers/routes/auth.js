@@ -91,7 +91,8 @@ router.post('/logout', errorHandler((req, res) =>{
         res.clearCookie('user')
     }
     res.redirect('/')
-}));
+}))
+
 
 
 
