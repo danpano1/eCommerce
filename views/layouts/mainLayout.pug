@@ -10,6 +10,8 @@ nav
   .nav-bar
     a(href='/')
       button.nav-button(type='button' class=(pagePath==='/' ? 'active' : '')) Shop
+    a(href='/products?page=1')
+        button.nav-button(type='button' class=(pagePath==='/products' ? 'active' : '')) Products   
     if isLoggedIn
       a(href='/admin/addproduct')
         button.nav-button(type='button' class=(pagePath==='/admin/addproduct' ? 'active' : '')) Add product

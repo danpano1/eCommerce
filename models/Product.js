@@ -33,7 +33,7 @@ const productValidation = (product) => {
     
     const schema = {
         name: Joi.string().min(5).trim().required(),
-        price: Joi.number().trim().required(),
+        price: Joi.number().required(),
         imageURL: Joi.string().
                     trim().
                     regex(/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/).                    
@@ -48,7 +48,7 @@ const productValidation = (product) => {
                     }),
 
         description: Joi.string().trim().min(10).required(),
-        quantity: Joi.number().trim().required(),
+        quantity: Joi.number().required(),
         _csrf: Joi.required(),
     }
     const result = Joi.validate(product, schema, {
@@ -81,7 +81,7 @@ const getRandomProducts = async (numberOfProducts) =>{
             img: randomProduct.imageURL
         })
     }
-    
+
     return allRandomProducts    
 }
 

@@ -29,9 +29,56 @@ router.get('/products/:id', errorHandler(async (req, res)=>{
         price: product.price,
         description: product.description,
         id: product._id,
-        pagePath: '/',
+        pagePath: '/products',
         pageTitle: product.name
     })
+}))
+
+router.get('/products' , errorHandler(async (req, res)=>{
+    
+    let prodPerPage = 1;
+
+    let page = req.query.page || 1;
+        
+    if(isNaN(page)) res.status(400).send('Page must be a number')
+    page = parseInt(page)
+    if(page<1) page = 1
+        
+    const numberOfProd = await Product.countDocuments();
+
+    const lastPage = Math.ceil((numberOfProd/prodPerPage))
+
+    if(page>lastPage) page = lastPage    
+
+    let prodsToSkip = prodPerPage*(page-1);
+    const prodsToShow = [];
+
+    if (prodPerPage*page > numberOfProd) prodPerPage += numberOfProd - prodPerPage*page;
+         
+
+    for(let i = 0; i<prodPerPage; i++){
+        const productFromDb = await Product.findOne().skip(prodsToSkip);
+
+        prodsToShow.push({
+            id: productFromDb._id,
+            name: productFromDb.name,
+            price: productFromDb.price,
+            img: productFromDb.imageURL
+        })
+
+        prodsToSkip++
+        
+    }
+
+    res.render('shop/products', {
+        products: prodsToShow,
+        pages: lastPage,
+        pagePath: '/products',
+        pageTitle: `Page ${page}`,
+        currentPage: page
+    })
+
+
 }))
 
 router.get('/cart', errorHandler(async (req, res)=>{

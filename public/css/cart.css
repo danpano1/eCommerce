@@ -1,7 +1,5 @@
 .cartProductContainer{
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 50px;
+    margin: 25px auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -49,4 +47,12 @@
     border: none;
     background-color: #018d20;
     border-radius: 30px;
+}
+
+.cartProductData{
+    font-size: 22px;
+    font-weight: 700;
+    width: 250px;
+    text-align: center;
+    word-wrap: break-word;
 }

@@ -50,7 +50,7 @@ module.exports = class Cart {
         for(let i = 0; i<products.length; i++){
             
             const productFromDB = await Product.findById(products[i].id);
-            
+                        
             if(products[i].quantity>0) {
 
                 productsToDisplay.push({

@@ -9,10 +9,10 @@ block content
         each prod in products
             .cartProductContainer
                 img.productImage(src=prod.imageURL, alt="")
-                p.productName #{prod.name}
-                p.productPrice #{prod.price}$
-                p.productDestription Quantity: #{prod.quantity}
-                p.productPrice Whole value: #{prod.price * prod.quantity}$
+                p.cartProductData #{prod.name}
+                p.cartProductData #{prod.price}$
+                p.cartProductData Quantity: #{prod.quantity}
+                p.cartProductData Whole value: #{prod.price * prod.quantity}$
                 .inc-decContainer
                     form(action="/cart", method="post")
                         input(type="hidden", name="productID", value=prod.id)

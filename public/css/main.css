@@ -13,9 +13,15 @@ button{
     letter-spacing: .2px;
     color: #ebe7e7;
 }
+a{
+    color: #ebe7e7;
+    text-decoration: none;
+}
+button:hover{
+    cursor: pointer;
+}
 body{
-    background-color: #4c4c4c;
-    width: 100vw;
+    background-color: #4c4c4c; 
 }
 
 .nav-bar{
@@ -84,4 +90,8 @@ body{
     background: #9b0000;
     border-radius: 50%;
     right: 5px;
+}
+
+.dots{
+    letter-spacing: 2px;
 }

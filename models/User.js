@@ -52,22 +52,24 @@ const userValidation = (user)=>{
         name: Joi.string().trim().min(3).max(12).required(),
         surname: Joi.string().trim().min(3).max(12).required(),
         email: Joi.string().trim().email().lowercase().required(),
-        password: Joi.string().trim().min(5).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]/).error((errs)=>{
+        password: Joi.string().trim().min(5).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]/).required().error((errs)=>{
             return(errs.map((err)=>{
-                if (err.type === 'string.regex.base')
+            if (err.type === 'string.regex.base')
                 return {message : '"password" must contain at least 5 characters including one: number, big and small letter'}
-            else
-                return {message : '"password" is reqruired and must be a string'};
+            if (err.type === 'any.empty')
+                return {message : '"password" is reqruired'};
+            else 
+                return {message : '"password" must be a string'};
             }))
-        }).required(),        
+        }),               
         confirmPassword: Joi.string().trim(),
         _csrf: Joi.required(),
-                   
+        
     }
-    return Joi.validate(user , schema, {
+    
+    return  Joi.validate(user , schema, {
         abortEarly: false
-    })
-
+})
 }
 
 const setUserCookie = async (res, user, cb) =>{
