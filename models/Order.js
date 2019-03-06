@@ -40,6 +40,10 @@ const orderSchema = new Schema({
         type: String,
         required: true
     },
+    city:{
+        type: String,
+        required: true
+    },
     postCode:{
         type: String,
         required: true
@@ -55,7 +59,7 @@ const Order = mongoose.model('Order', orderSchema);
 
 const products = Joi.object().keys({
     productId: Joi.string().regex(/^[a-f\d]{24}$/i).required(),
-    productQuantity: Joi.number().greater(0).required()
+    productQuantity: Joi.number().greater(0).required(),
 })
 
 const orderValidation = (order) => {
@@ -66,6 +70,7 @@ const orderValidation = (order) => {
         surname: Joi.string().required(),
         email: Joi.string().email().required(),
         country: Joi.string().required(),
+        city: Joi.string().required(),
         postCode: Joi.string().required(),
         streetAdress: Joi.string().required()
     }

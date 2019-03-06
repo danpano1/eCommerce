@@ -1,25 +1,27 @@
 extends ../layouts/mainLayout.pug
 block styles 
     link(rel="stylesheet", href="/css/order.css")
-block content
-    form.formContainer(action='/ordering' method='post')    
-        if orders.length>0 
-            each order in orders
-                .orderContainer
-                    h3 #{order.orderDate}
-                    h4 Order data
-                    p #{order.name} #{order.surname}
-                    p #{order.email}
-                    p #{order.postCode} #{order.streetAdress} #{order.country}        
-                        each prod in order.products
-                            .orderProductContainer
-                                img.orderProductImage(src=prod.imageURL, alt="")
-                                p.orderProductData #{prod.name}
-                                p.orderProductData #{prod.price}$
-                                p.orderProductData Quantity: #{prod.quantity}                                
-                        .wholeValueContainer
-                            p.wholeValueData Whole price
-                            p.wholeValueData #{order.wholePrice}$
+block content       
+    if orders.length>0 
+        each order in orders
+            .orderContainer
+                h3 #{order.orderDate}
+                h4 Order data
+                p #{order.name} #{order.surname}
+                p #{order.email}
+                p #{order.postCode}, #{order.city} 
+                p #{order.streetAdress}, #{order.country}        
+                    each prod in order.products
+                        .orderProductContainer
+                            img.orderProductImage(src=prod.imageURL, alt="")
+                            p.orderProductData #{prod.name}
+                            p.orderProductData #{prod.price}$
+                            p.orderProductData Quantity: #{prod.quantity}                                
+                    .wholeValueContainer
+                        p.wholeValueData Whole price
+                        p.wholeValueData #{order.wholePrice}$
+                    a(href=`/invoices/${order.orderId}`)
+                        button.stdButton Invoice
         else
             .orderInfo
                 p You have no orders.

@@ -51,11 +51,13 @@ router.get('/myorders', errorHandler(async (req, res)=>{
             wholeValue += userOrders[i].products[x].productQuantity * product.price
         }
         orders.push({
+            orderId: userOrders[i]._id,
             orderDate: userOrders[i].orderDate,
             name: userOrders[i].name,
             surname: userOrders[i].surname,
             email: userOrders[i].email,
             postCode: userOrders[i].postCode,
+            city: userOrders[i].city,
             streetAdress: userOrders[i].streetAdress,
             country: userOrders[i].country,
             products: products,

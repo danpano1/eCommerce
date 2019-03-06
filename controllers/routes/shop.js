@@ -6,6 +6,7 @@ const Cart = require('../../models/Cart')
 const errorHandler = require('../middleware/errorHandler');
 const {User, verifyUserToken} = require('../../models/User')
 const {Order, orderValidation, createOrderToken, verifyOrderToken} = require('../../models/Order')
+const createInvoicePdf = require('../../utils/invoicePdf')
 
 
 router.get('/', errorHandler(async (req, res)=>{
@@ -22,16 +23,29 @@ router.get('/', errorHandler(async (req, res)=>{
 
 
 router.get('/products/:id', errorHandler(async (req, res)=>{
-    const product = await Product.findById(req.params.id);
-    res.render('shop/productPage', {
-        img: product.imageURL,
-        name: product.name,
-        price: product.price,
-        description: product.description,
-        id: product._id,
-        pagePath: '/products',
-        pageTitle: product.name
+
+    Product.findById(req.params.id)
+    .then((product)=>{
+
+        if(!product) return res.redirect('/')
+
+        res.render('shop/productPage', {
+            img: product.imageURL,
+            name: product.name,
+            price: product.price,
+            description: product.description,
+            id: product._id,
+            pagePath: '/products',
+            pageTitle: product.name
+        })
     })
+    .catch((err)=>{
+
+        return res.redirect('/')
+
+    })
+   
+    
 }))
 
 router.get('/products' , errorHandler(async (req, res)=>{
@@ -40,7 +54,7 @@ router.get('/products' , errorHandler(async (req, res)=>{
 
     let page = req.query.page || 1;
         
-    if(isNaN(page)) res.status(400).send('Page must be a number')
+    if(isNaN(page)) return res.status(400).send('Page must be a number')
     page = parseInt(page)
     if(page<1) page = 1
         
@@ -201,6 +215,7 @@ router.post('/ordering', errorHandler(async (req, res, next)=>{
             email: req.body.email,
             country: req.body.country,
             postCode: req.body.postCode,
+            city: req.body.city,
             streetAdress: req.body.streetAdress,
             userId: userId
         }
@@ -223,6 +238,7 @@ router.post('/ordering', errorHandler(async (req, res, next)=>{
         if(userFromDB) {
             userFromDB.country = req.body.country
             userFromDB.postCode = req.body.postCode
+            userFromDB.city = req.body.city
             userFromDB.streetAdress = req.body.streetAdress
 
             userFromDB.save();
@@ -234,6 +250,8 @@ router.post('/ordering', errorHandler(async (req, res, next)=>{
         await newOrder.save();
 
         res.clearCookie('cart');
+
+        if(userFromDB) return res.redirect('/myorders')
         
         createOrderToken(newOrder._id, (err, orderToken)=>{
             
@@ -269,11 +287,13 @@ router.get('/orders/:orderToken', async (req, res) => {
         }
 
         const order = {
+            token: orderToken,         
             orderDate: orderFromDb.orderDate,
             name: orderFromDb.name,
             surname: orderFromDb.surname,
             email: orderFromDb.email,
             postCode: orderFromDb.postCode,
+            city: orderFromDb.city,
             streetAdress: orderFromDb.streetAdress,
             country: orderFromDb.country,
             products: products,
@@ -285,6 +305,43 @@ router.get('/orders/:orderToken', async (req, res) => {
         })
     })
 })
+
+router.get('/invoices/:order', errorHandler((req, res)=>{   
+
+
+    if (req.cookies.user) {
+        verifyUserToken(req.cookies.user, (user)=>{
+            if(!user) return res.redirect('/')
+
+            const orderId = req.params.order
+
+            Order.findById(orderId)
+            .then((order)=>{ 
+                if(!order) return res.redirect('/')
+                
+                createInvoicePdf(order, res);
+                
+                
+            })
+            .catch((err)=>{
+                res.redirect('/')
+            })
+        })        
+    } else {
+        const orderToken = req.params.order;
+
+        verifyOrderToken(orderToken, async (orderEncrypted)=>{
+            
+            if(!orderEncrypted) return res.redirect('/')
+
+            const order = await Order.findById(orderEncrypted.orderId)
+
+            createInvoicePdf(order, res);
+
+        })
+    }
+}))
+
 
 
 module.exports = router;
