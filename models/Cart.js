@@ -1,4 +1,5 @@
 const {Product} = require('../models/Product');
+const mongoose = require('mongoose')
 
 module.exports = class Cart {
     constructor(res, product){
@@ -46,24 +47,38 @@ module.exports = class Cart {
 
         let productsToDisplay = [];
         const products = req.signedCookies.cart.items
+        let prodIds = []
         
-        for(let i = 0; i<products.length; i++){
-            
-            const productFromDB = await Product.findById(products[i].id);
-                        
+        products.forEach((prod)=>{
+            prodIds.push(mongoose.Types.ObjectId(prod.id))
+        })
+
+        const productsFromDB = await Product.find({
+            _id:{
+                $in: prodIds
+            }
+        })
+        
+        for(let i = 0; i<productsFromDB.length; i++){
             if(products[i].quantity>0) {
 
                 productsToDisplay.push({
-                    id: productFromDB._id,
-                    name: productFromDB.name,
-                    price: productFromDB.price,
-                    imageURL: productFromDB.imageURL,
-                    quantity: products[i].quantity
-                });      
+                    id: productsFromDB[i]._id,
+                    name: productsFromDB[i].name,
+                    price: productsFromDB[i].price,
+                    imageURL: productsFromDB[i].imageURL,
+                    quantity: products[i].quantity});      
         
             }
+
+        }
         
-        }   
+            
+            
+                        
+           
+        
+           
         
         return productsToDisplay
     }

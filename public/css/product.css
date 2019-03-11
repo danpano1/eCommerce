@@ -21,7 +21,8 @@
     flex-direction: column;
     background-color: #3c3c3c;
     border-radius: 10%;
-    position: relative;
+    position: relative; 
+    overflow: hidden;   
 }
 
 .aboutProducts{
@@ -39,7 +40,7 @@
 .productName{
     font-weight: 700;
     font-size: 22px;  
-    margin:5px;
+    margin:5px;        
 }
 .productPrice{
     font-weight: 700;

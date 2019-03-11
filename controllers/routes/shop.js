@@ -50,7 +50,7 @@ router.get('/products/:id', errorHandler(async (req, res)=>{
 
 router.get('/products' , errorHandler(async (req, res)=>{
     
-    let prodPerPage = 1;
+    let prodPerPage = 3;
 
     let page = req.query.page || 1;
         
