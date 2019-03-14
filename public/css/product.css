@@ -75,3 +75,10 @@
  .activePaginationButton{
     background-color: #9c9c9c;
  }
+
+ .buttonProductWrapper{
+     display: flex;
+     flex-direction: row;
+     justify-content: center;
+ }
+

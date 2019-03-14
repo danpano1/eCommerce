@@ -72,14 +72,7 @@ module.exports = class Cart {
             }
 
         }
-        
-            
-            
-                        
-           
-        
-           
-        
+               
         return productsToDisplay
     }
 

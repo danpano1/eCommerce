@@ -23,7 +23,7 @@ const productSchema = new Schema ({
     quantity: {
         type: Number,
         required: true
-    }
+    },
 
 });
 const Product = mongoose.model('Product', productSchema);
@@ -50,6 +50,7 @@ const productValidation = (product) => {
         description: Joi.string().trim().min(10).required(),
         quantity: Joi.number().required(),
         _csrf: Joi.required(),
+        id: Joi.optional(),
     }
     const result = Joi.validate(product, schema, {
         abortEarly: false
@@ -58,34 +59,78 @@ const productValidation = (product) => {
 }
 
 const getRandomProducts = async (numberOfProducts) =>{
-    const count = await Product.countDocuments();
-    let allRandomProducts = [];
-    let randomNumbers = [];
     
-    if(numberOfProducts>count) numberOfProducts = count;
+    const numberOfItemsInDb = await Product.countDocuments();
+
+    let randomProducts = [];
     
-    for(let i = 0; i<numberOfProducts; i++){
-        let random = 0;
+    if(numberOfProducts>numberOfItemsInDb) numberOfProducts = numberOfItemsInDb; 
 
-        do random = Math.floor(Math.random()*count)+1;
-        while (randomNumbers.find(n => n === random))
-        
-        randomNumbers.push(random);
+    let productsToSkip = Math.floor(Math.random()*(numberOfItemsInDb - numberOfProducts + 1));   
+      
 
-        const randomProduct = await Product.findOne().skip(--random);
+    const productsFromDb = await Product.find().skip(productsToSkip).limit(numberOfProducts)
+    
+    productsFromDb.forEach( prod =>{
 
-        allRandomProducts.push({
-            id: randomProduct._id,
-            name: randomProduct.name,
-            price: randomProduct.price,
-            img: randomProduct.imageURL
+        randomProducts.push({
+            id: prod._id,
+            name: prod.name,
+            price: prod.price,
+            img: prod.imageURL
         })
-    }
+   
+    })
+       
 
-    return allRandomProducts    
+    return randomProducts    
+}
+
+const getPagination = async (pageNumber, prodPerPage) =>{   
+       
+    let page = pageNumber || 1;
+        
+    if(isNaN(page)) page = 1
+
+    page = parseInt(page)
+    
+    if(page<1) page = 1
+        
+    const numberOfProd = await Product.countDocuments();
+
+    const lastPage = Math.ceil((numberOfProd/prodPerPage))
+
+    if(page>lastPage) page = lastPage    
+
+    let prodsToSkip = prodPerPage*(page-1);    
+
+    if (prodPerPage*page > numberOfProd) prodPerPage += numberOfProd - prodPerPage*page;
+
+    const productsFromDb = await Product.find().skip(prodsToSkip).limit(prodPerPage)
+    const prodsToShow = [];
+         
+
+    productsFromDb.forEach(prod =>{
+        
+        prodsToShow.push({
+            id: prod._id,
+            name: prod.name,
+            price: prod.price,
+            img: prod.imageURL
+        })
+
+    })
+    return {
+        products: prodsToShow,
+        lastPage: lastPage,
+        currentPage: page
+    }      
+        
+    
 }
 
 
 module.exports.Product = Product;
 module.exports.productValidation = productValidation;
 module.exports.getRandomProducts = getRandomProducts;
+module.exports.getPagination = getPagination;

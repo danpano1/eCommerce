@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {User, userValidation, setUserCookie} = require('../../models/User')
+const {User, userValidation, setUserCookie, hashPassword} = require('../../models/User')
 const bcrypt = require('bcrypt');
 const errorHandler = require('../middleware/errorHandler');
 
@@ -34,6 +34,8 @@ router.post('/login', errorHandler(async (req, res)=>{
     setUserCookie(res, user, (err)=>{
 
         if(err) next(err);
+
+        if(user.isAdmin) res.redirect('/admin/products')
         
         res.redirect('/');
     })
@@ -49,10 +51,9 @@ router.get('/register', errorHandler((req, res)=>{
 }))
 
 router.post('/register', errorHandler(async (req, res)=>{
-    
-    const {error} = userValidation(req.body);
-    
     let joiLikeErrors = [];
+
+    const {error} = userValidation(req.body);   
 
 
     if(error) joiLikeErrors = (error.details)
@@ -74,7 +75,7 @@ router.post('/register', errorHandler(async (req, res)=>{
     }
 
 
-    const hashedPassword = await bcrypt.hash(req.body.password, 12)
+    const hashedPassword = await hashPassword(req.body.password)
 
     const newUser = new User({
         name: req.body.name,

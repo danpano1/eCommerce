@@ -26,3 +26,11 @@
 .errorMessage{
     color: #ff3f3f;
 }
+ .doneMessage{
+     color: #44bf57;
+     font-size: 20px;
+     width: 100%;
+     display: flex;
+     justify-content: center;
+     margin-top: 50px;
+ }

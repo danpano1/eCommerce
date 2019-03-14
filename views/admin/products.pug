@@ -12,23 +12,23 @@ block content
                     p.productPrice #{prod.price}$
                     p.productDestription #{prod.description}
                     .buttonProductWrapper
-                        form(action="/cart", method="post")
+                        form(action="/admin/deleteproduct", method="post")
                             input(type="hidden", name="productID", value=prod.id)
                             input(type="hidden", name="_csrf", value=csrfToken)
-                            button(type="submit").stdButton Add to cart
-                        a(href="/products/"+prod.id)
-                            button(type="button").stdButton Show details
+                            button(type="submit").stdButton Delete
+                        a(href="/admin/products/"+prod.id)
+                            button(type="button").stdButton Edit
     .pagination        
         if currentPage!==1
-            a(href=`/products?page=${currentPage-1}`)
+            a(href=`/admin/products?page=${currentPage-1}`)
                 i.fas.fa-angle-left.paginationArrow        
-        a(href=`/products?page=1`) 
+        a(href=`/admin/products?page=1`) 
             button.paginationButton(class=(currentPage===1 ? 'activePaginationButton' : '')) #{1} 
         if pages > 1
             if pages <= 7 
                 - var i = 2
                 while (i<pages)
-                    a(href=`/products?page=${i}`) 
+                    a(href=`/admin/products?page=${i}`) 
                         button.paginationButton(class=(currentPage===i ? 'activePaginationButton' : '')) #{i} 
                     - i++
             else                     
@@ -36,7 +36,7 @@ block content
                     span.dots ...
                     - var i = 0
                     while (i<5)
-                        a(href=`/products?page=${currentPage-2+i}`) 
+                        a(href=`/admin/products?page=${currentPage-2+i}`) 
                             button.paginationButton(class=(currentPage===currentPage-2+i ? 'activePaginationButton' : '')) #{currentPage-2+i}
                         - i++
                     span.dots ...
@@ -45,7 +45,7 @@ block content
                         - var i = currentPage+1
                         - var i2 = 2
                         while (i>0)
-                            a(href=`/products?page=${i2}`) 
+                            a(href=`/admin/products?page=${i2}`) 
                                 button.paginationButton(class=(currentPage===i2 ? 'activePaginationButton' : '')) #{i2}                    
                             - i--
                             - i2++
@@ -55,12 +55,12 @@ block content
                         - var i = 2+pages-currentPage
                         - var i2 = currentPage -2
                         while (i>0)
-                            a(href=`/products?page=${i2}`) 
+                            a(href=`/admin/products?page=${i2}`) 
                                 button.paginationButton(class=(currentPage===i2 ? 'activePaginationButton' : '')) #{i2}                    
                             - i--
                             - i2++                    
-            a(href=`/products?page=${pages}`) 
+            a(href=`/admin/products?page=${pages}`) 
                 button.paginationButton(class=(currentPage===pages ? 'activePaginationButton' : '')) #{pages}            
             if currentPage!==pages
-                a(href=`/products?page=${currentPage+1}`)
+                a(href=`/admin/products?page=${currentPage+1}`)
                     i.fas.fa-angle-right.paginationArrow

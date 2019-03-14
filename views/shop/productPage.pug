@@ -8,7 +8,7 @@ block content
         .aboutProducts
             p.productName #{pname}
             p.productPrice #{price}$
-            p.productDestription #{description}
+            p.productDestription #{description}            
             form(action="/cart", method="post")
                 input(type="hidden", name="productID", value=id)
                 input(type="hidden", name="_csrf", value=csrfToken)

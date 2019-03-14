@@ -13,6 +13,7 @@ const userRoutes = require('./controllers/routes/user');
 const notFound = require('./controllers/middleware/notFound');
 const locals = require('./controllers/middleware/locals');
 const userAuthorization = require('./controllers/middleware/userAuthorization')
+const adminAuthorization = require('./controllers/middleware/adminAuthorization')
 const serverError = require('./controllers/middleware/serverErrors')
 
 const app = express();
@@ -28,9 +29,10 @@ app.use(express.static('public'));
 app.use(csurf({cookie: true}));
 app.use(locals);
 
+app.use('/admin', adminAuthorization, adminRoutes);
 app.use('/', shopRoutes, authRoutes);
 app.use('/', userAuthorization, userRoutes);
-app.use('/admin', adminRoutes);
+
 
 app.use(serverError);
 app.use(notFound);

@@ -2,14 +2,21 @@ extends ../layouts/mainLayout.pug
 
 block styles
     link(rel="stylesheet", href="/css/product.css")
-    link(rel="stylesheet", href="/css/productSent.css")
-block content
-    a(href='/admin/addproduct')
-        button.addAnother Add another       
+block content          
     .productContainer
-        img.productImage(src=img alt='')
+        img.productImage(src=product.imageURL alt='')
         .aboutProducts
-            p.productName #{name}
-            p.productPrice #{price}$
-            p.productDestription #{description}
+            p.productName #{product.name}
+            p.productPrice #{product.price}$
+            p.productDestription #{product.description}
+            .buttonProductWrapper
+                form(action="/admin/deleteproduct", method="post")
+                    input(type="hidden", name="productID", value=product._id)
+                    input(type="hidden", name="_csrf", value=csrfToken)
+                    button(type="submit").stdButton Delete
+                a(href=`/admin/products/${product._id}`)
+                    button(type="button").stdButton Edit
+    if pagePath === "/admin/addproduct"
+        a(href='/admin/addproduct')
+            button.stdButton.centerHoriziontal Add another 
 

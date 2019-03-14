@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {User} = require('../../models/User')
+const {User, hashPassword, comparePassword, changePasswordValidation} = require('../../models/User')
 const errorHandler = require('../middleware/errorHandler');
 const {Order} = require('../../models/Order');
 const {Product} = require('../../models/Product');
@@ -70,6 +70,49 @@ router.get('/myorders', errorHandler(async (req, res)=>{
         pagePath: "/myorders",
         orders: orders});
     
+}))
+
+
+router.get('/changepassword', errorHandler((req, res)=>{
+    res.render('user/changepassword',{
+        pageTitle: "Change password",        
+    })
+}))
+
+router.post('/changepassword', errorHandler(async (req, res)=>{
+    const userId = res.locals.user.id;
+    let joiLikeErrors = [];
+    
+
+    const {error} = changePasswordValidation({newPassword: req.body.newPassword})
+
+    if (error) joiLikeErrors = (error.details)
+    
+    const isPasswordCorrect = await comparePassword(req.body.currentPassword, userId)
+    
+
+    if(!isPasswordCorrect) joiLikeErrors.push({message: 'Current password is not correct'})
+
+    if(req.body.newPassword!==req.body.confNewPassword) joiLikeErrors.push({message: 'New passwords do not match'})  
+    
+    
+
+    if (joiLikeErrors.length>0) return res.render('user/changepassword',{
+        pageTitle: "Change password",
+        errs: joiLikeErrors        
+    })
+
+
+    const hashedNewPassword = await hashPassword(req.body.newPassword)
+
+    
+    await User.findOneAndUpdate({_id: userId}, {password: hashedNewPassword});
+
+    res.render('user/changepassword',{
+        pageTitle: "Change password",
+        done: true        
+    })
+
 }))
 
 module.exports = router
