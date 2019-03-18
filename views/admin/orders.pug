@@ -12,9 +12,9 @@ block content
                 p #{order.postCode}, #{order.city} 
                 p #{order.streetAdress}, #{order.country}        
                     each prod in order.products
-                        .orderProductContainer
-                            img.orderProductImage(src=prod.imageURL, alt="")
+                        .orderProductContainer                            
                             p.orderProductData #{prod.name}
+                            p.orderProductData #{prod.id}
                             p.orderProductData #{prod.price}$
                             p.orderProductData Quantity: #{prod.quantity}                                
                     .wholeValueContainer
@@ -24,4 +24,4 @@ block content
                         button.stdButton Invoice
     else
         .orderInfo
-            p You have no orders.
+            p There is no orders that are not sent

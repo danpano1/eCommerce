@@ -1,12 +1,11 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 const Joi = require('joi');
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 
-const saltForPassword = 12;
+const {privateJWTkey, saltForPassword} = require('../config/config')
 
-const privateJWTkey = 'privateKey'
+const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
     name:{
@@ -48,9 +47,7 @@ const userSchema = new Schema({
 
 });
 
-const User = mongoose.model('User', userSchema);
-
-const userValidation = (user)=>{
+userSchema.statics.userValidation = (user)=>{
     const schema = {
         name: Joi.string().trim().min(3).max(12).required(),
         surname: Joi.string().trim().min(3).max(12).required(),
@@ -75,7 +72,7 @@ const userValidation = (user)=>{
 })
 }
 
-const changePasswordValidation = (password) => {
+userSchema.statics.changePasswordValidation = (password) => {
     const schema = {
         newPassword: Joi.string().trim().min(5).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]/).required().error((errs)=>{
             return(errs.map((err)=>{
@@ -92,14 +89,14 @@ const changePasswordValidation = (password) => {
 
     return Joi.validate(password , schema, {
         abortEarly: false
-})
+    })
 }
 
-const setUserCookie = async (res, user, cb) =>{
+userSchema.methods.setUserCookie = async function (res, cb){
     
     jwt.sign({
-        id: user._id,
-        isAdmin: user.isAdmin
+        id: this._id,
+        isAdmin: this.isAdmin
     }, privateJWTkey, {
         expiresIn: '1h'
     }, (err, userToken) =>{        
@@ -113,7 +110,7 @@ const setUserCookie = async (res, user, cb) =>{
     })
 }
 
-const verifyUserToken = async (token, cb) =>{
+userSchema.statics.verifyUserToken = async (token, cb) =>{
     jwt.verify(token, privateJWTkey, (err, userEncrypted)=>{
         
         let user = false
@@ -124,26 +121,18 @@ const verifyUserToken = async (token, cb) =>{
     })
 }
 
-const hashPassword = async (password) =>{
+userSchema.statics.hashPassword = async (password) =>{
     const hashedPassword = await bcrypt.hash(password, saltForPassword)
 
     return hashedPassword
 }
 
-const comparePassword = async (password, userId) => {
-    const userFromDb = await User.findById(userId)
+userSchema.statics.comparePassword = async function (password, userId){
+    const userFromDb = await this.findById(userId)
 
     const isPasswordCorrect = bcrypt.compare(password, userFromDb.password)
 
     return isPasswordCorrect
 }
 
-
-
-module.exports.User = User;
-module.exports.userValidation = userValidation;
-module.exports.setUserCookie = setUserCookie;
-module.exports.verifyUserToken = verifyUserToken;
-module.exports.hashPassword = hashPassword;
-module.exports.comparePassword = comparePassword;
-module.exports.changePasswordValidation = changePasswordValidation;
+module.exports = mongoose.model('User', userSchema);

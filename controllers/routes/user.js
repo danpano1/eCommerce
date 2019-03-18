@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const {User, hashPassword, comparePassword, changePasswordValidation} = require('../../models/User')
+
+const User = require('../../models/User')
+const Order = require('../../models/Order');
+const Product = require('../../models/Product');
 const errorHandler = require('../middleware/errorHandler');
-const {Order} = require('../../models/Order');
-const {Product} = require('../../models/Product');
 
 router.get('/profile', errorHandler(async (req, res)=>{
 
@@ -84,11 +85,11 @@ router.post('/changepassword', errorHandler(async (req, res)=>{
     let joiLikeErrors = [];
     
 
-    const {error} = changePasswordValidation({newPassword: req.body.newPassword})
+    const {error} = User.changePasswordValidation({newPassword: req.body.newPassword})
 
     if (error) joiLikeErrors = (error.details)
     
-    const isPasswordCorrect = await comparePassword(req.body.currentPassword, userId)
+    const isPasswordCorrect = await User.comparePassword(req.body.currentPassword, userId)
     
 
     if(!isPasswordCorrect) joiLikeErrors.push({message: 'Current password is not correct'})
@@ -103,7 +104,7 @@ router.post('/changepassword', errorHandler(async (req, res)=>{
     })
 
 
-    const hashedNewPassword = await hashPassword(req.body.newPassword)
+    const hashedNewPassword = await User.hashPassword(req.body.newPassword)
 
     
     await User.findOneAndUpdate({_id: userId}, {password: hashedNewPassword});

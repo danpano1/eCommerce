@@ -5,11 +5,11 @@ block styles
 block content
         form.formContainer(action='/register' method='post')    
             label(for='login') Name
-            input.formInput(type='text' name='name')
+            input.formInput(type='text' name='name' value=userData.name)
             label(for='login') Surname
-            input.formInput(type='text' name='surname')
+            input.formInput(type='text' name='surname' value=userData.surname)
             label(for='email') Email
-            input.formInput(type='text' name='email')
+            input.formInput(type='text' name='email' value=userData.email)
             label(for='password') Password
             input.formInput(type='password' name='password')
             label(for='confirmPassword') Confirm password

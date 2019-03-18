@@ -23,5 +23,5 @@ block content
                         input(type="hidden", name="_csrf", value=csrfToken)
                         button(type="submit").bigFontBtn -
     if !products || products.length <= 0
-        .emptyCart 
+        .infoMsg 
             p Cart is empty

@@ -1,21 +1,8 @@
 const pdfMake = require('pdfmake');
-const mongoose = require('mongoose')
-const {Product} = require('../models/Product')
 
 module.exports = async (order, res) => {
-    const pdfName = `invoice-${order._id}.pdf`
-    let wholeValueToPay = 0
-    let prodsId = [];
-    
-    order.products.forEach((prod)=>{       
-        prodsId.push(mongoose.Types.ObjectId(prod.productId))
-    })
-
-    const productsFromDb = await Product.find({
-        _id:{
-            $in: prodsId
-        }
-    })
+    const pdfName = `invoice-${order.id}.pdf`
+   
 
     res.setHeader('Content-Type', 'application/pdf')
     res.setHeader('Content-Disposition', `inline; filename=${pdfName}`)
@@ -91,28 +78,27 @@ module.exports = async (order, res) => {
       
 
    
-    for(let i = 0; i<productsFromDb.length; i++){
+    order.products.forEach(prod => {
         
-        const productsValue = order.products[i].productQuantity * productsFromDb[i].price
-        wholeValueToPay += productsValue
-
         docDefinition.content.push({
             columns: [
               {
                 style: 'dataColumn',
-                text: `${productsFromDb[i].name}`
+                text: `${prod.name}`
               },
               {
                 style: 'dataColumn',
-                text: `${order.products[i].productQuantity}`
+                text: `${prod.quantity}`
               },
               {
                 style: 'dataColumn',
-                text: `${productsValue}`
+                text: `${prod.price*prod.quantity}`
               },              
             ],          
-          })      
-    }
+          })     
+
+    })      
+    
 
     docDefinition.content.push(
         {
@@ -143,7 +129,7 @@ module.exports = async (order, res) => {
         },
         {
             style: 'dataColumn',           
-            text: `${wholeValueToPay}`            
+            text: `${order.wholePrice}`            
         }
     ],
     },

@@ -3,19 +3,23 @@ extends ../layouts/mainLayout.pug
 block styles
     link(rel="stylesheet", href="/css/product.css")
 block content
-    .mainContainer
-        each prod in products
-            .productContainer
-                img.productImage(src=prod.img alt='')
-                .aboutProducts
-                    p.productName #{prod.name}
-                    p.productPrice #{prod.price}$
-                    p.productDestription #{prod.description}
-                    .buttonProductWrapper
-                        form(action="/cart", method="post")
-                            input(type="hidden", name="productID", value=prod.id)
-                            input(type="hidden", name="_csrf", value=csrfToken)
-                            button(type="submit").stdButton Add to cart                        
-                        a(href="/products/"+prod.id)
-                            button(type="button").stdButton Show details
+    if isEmpty
+        .infoMsg
+            p There is no products
+    else
+        .mainContainer
+            each prod in products
+                .productContainer
+                    img.productImage(src=prod.img alt='')
+                    .aboutProducts
+                        p.productName #{prod.name}
+                        p.productPrice #{prod.price}$
+                        p.productDestription #{prod.description}
+                        .buttonProductWrapper
+                            form(action="/cart", method="post")
+                                input(type="hidden", name="productID", value=prod.id)
+                                input(type="hidden", name="_csrf", value=csrfToken)
+                                button(type="submit").stdButton Add to cart                        
+                            a(href="/products/"+prod.id)
+                                button(type="button").stdButton Show details
                 

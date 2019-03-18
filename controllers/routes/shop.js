@@ -1,20 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const {getRandomProducts} = require('../../models/Product')
-const {Product, getPagination} = require('../../models/Product')
-const Cart = require('../../models/Cart')
+
+
+const Product = require('../../models/Product');
+const Cart = require('../../models/Cart');
+const User = require('../../models/User');
+const Order = require('../../models/Order');
 const errorHandler = require('../middleware/errorHandler');
-const {User, verifyUserToken} = require('../../models/User')
-const {Order, orderValidation, createOrderToken, verifyOrderToken} = require('../../models/Order')
-const createInvoicePdf = require('../../utils/invoicePdf')
+const createInvoicePdf = require('../../utils/invoicePdf');
 
 
 router.get('/', errorHandler(async (req, res)=>{
     
-    const productsToShow = await getRandomProducts(6);
+    const randomProducts = await Product.getRandomProducts(6);
     
     res.render('shop/shopIndex', {
-        products: productsToShow,
+        products: randomProducts.products,
+        isEmpty: randomProducts.isEmpty,
         pagePath: '/',
         pageTitle: 'eCommerce'
     })
@@ -24,19 +26,19 @@ router.get('/', errorHandler(async (req, res)=>{
 
 router.get('/products/:id', errorHandler(async (req, res)=>{
 
-    Product.findById(req.params.id)
+    Product.findNotRemoved({_id: req.params.id})
     .then((product)=>{
 
-        if(!product) return res.redirect('/')
+        if(!product[0]) return res.redirect('/')
 
         res.render('shop/productPage', {
-            img: product.imageURL,
-            name: product.name,
-            price: product.price,
-            description: product.description,
-            id: product._id,
+            img: product[0].imageURL,
+            name: product[0].name,
+            price: product[0].price,
+            description: product[0].description,
+            id: product[0]._id,
             pagePath: '/products',
-            pageTitle: product.name
+            pageTitle: product[0].name
         })
     })
     .catch((err)=>{
@@ -50,7 +52,7 @@ router.get('/products/:id', errorHandler(async (req, res)=>{
 
 router.get('/products' , errorHandler(async (req, res)=>{
 
-    const pagination = await getPagination(req.query.page, 3);   
+    const pagination = await Product.getProductPagination(req.query.page, 3);   
 
 
     res.render('shop/products', {
@@ -58,7 +60,8 @@ router.get('/products' , errorHandler(async (req, res)=>{
         pages: pagination.lastPage,
         pagePath: '/products',
         pageTitle: `Page ${pagination.currentPage}`,
-        currentPage: pagination.currentPage
+        currentPage: pagination.currentPage,
+        isEmpty: pagination.isEmpty
     })
 
 
@@ -115,7 +118,7 @@ router.get('/ordering', errorHandler(async (req, res)=>{
     const validationErr = req.cookies.error
     
     if (req.cookies.user){
-        verifyUserToken(req.cookies.user, async (user)=>{
+        User.verifyUserToken(req.cookies.user, async (user)=>{
             
             if(!user) return res.status(401).send('Bad token')
 
@@ -169,7 +172,7 @@ router.post('/ordering', errorHandler(async (req, res, next)=>{
         }        
     }      
     
-    verifyUserToken(req.cookies.user, async (user)=>{
+    User.verifyUserToken(req.cookies.user, async (user)=>{
         let userFromDB = null;
 
         if(user){
@@ -189,7 +192,7 @@ router.post('/ordering', errorHandler(async (req, res, next)=>{
             userId: userId
         }
         
-        const {error} = orderValidation(order)
+        const {error} = Order.orderValidation(order)
 
         if (error) {
             const errors = []
@@ -222,7 +225,7 @@ router.post('/ordering', errorHandler(async (req, res, next)=>{
 
         if(userFromDB) return res.redirect('/myorders')
         
-        createOrderToken(newOrder._id, (err, orderToken)=>{
+        newOrder.createOrderToken((err, orderToken)=>{
             
             if(err) return next(err);
 
@@ -234,43 +237,17 @@ router.post('/ordering', errorHandler(async (req, res, next)=>{
 router.get('/orders/:orderToken', async (req, res) => {
     const orderToken = req.params.orderToken;
 
-    verifyOrderToken(orderToken, async (orderEncrypted)=>{
+    Order.verifyOrderToken(orderToken, async (orderEncrypted)=>{
 
         if (!orderEncrypted) return res.status(400).send('Bad token')
         
-        const orderFromDb = await Order.findById(orderEncrypted.orderId);
-
-        let products = [];
-        let wholeValue = 0;
+        const orderToShow = await Order.getOrdersInfo({_id: orderEncrypted.orderId});
         
-        for(let i = 0; i<orderFromDb.products.length; i++){
-            const product = await Product.findById(orderFromDb.products[i].productId)
-
-            products.push({
-                imageURL: product.imageURL,
-                name: product.name,
-                price: product.price,
-                quantity: orderFromDb.products[i].productQuantity,
-            })      
-            wholeValue += orderFromDb.products[i].productQuantity * product.price
-        }
-
-        const order = {
-            token: orderToken,         
-            orderDate: orderFromDb.orderDate,
-            name: orderFromDb.name,
-            surname: orderFromDb.surname,
-            email: orderFromDb.email,
-            postCode: orderFromDb.postCode,
-            city: orderFromDb.city,
-            streetAdress: orderFromDb.streetAdress,
-            country: orderFromDb.country,
-            products: products,
-            wholePrice: wholeValue
-        }
-
+        orderToShow[0].token = orderToken
+       
+       
         res.render('shop/order', {
-            order: order
+            order: orderToShow[0]
         })
     })
 })
@@ -279,33 +256,34 @@ router.get('/invoices/:order', errorHandler((req, res)=>{
 
 
     if (req.cookies.user) {
-        verifyUserToken(req.cookies.user, (user)=>{
+        User.verifyUserToken(req.cookies.user, (user)=>{
             if(!user) return res.redirect('/')
 
-            const orderId = req.params.order
-
-            Order.findById(orderId)
-            .then((order)=>{ 
+            Order.getOrdersInfo({_id: req.params.order})
+            .then(order=>{
+            
                 if(!order) return res.redirect('/')
-                
-                createInvoicePdf(order, res);
-                
-                
+
+                createInvoicePdf(order[0], res);
             })
-            .catch((err)=>{
+            .catch(err=>{
                 res.redirect('/')
             })
+            
+            
+            
+            
         })        
     } else {
         const orderToken = req.params.order;
 
-        verifyOrderToken(orderToken, async (orderEncrypted)=>{
+        Order.verifyOrderToken(orderToken, async (orderEncrypted)=>{
             
             if(!orderEncrypted) return res.redirect('/')
 
-            const order = await Order.findById(orderEncrypted.orderId)
+            const order = await Order.getOrdersInfo({_id: orderEncrypted.orderId})
 
-            createInvoicePdf(order, res);
+            createInvoicePdf(order[0], res);
 
         })
     }

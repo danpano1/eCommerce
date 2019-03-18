@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 const Joi = require('joi');
+
+const Schema = mongoose.Schema;
 
 const productSchema = new Schema ({
     name: {
@@ -24,11 +25,14 @@ const productSchema = new Schema ({
         type: Number,
         required: true
     },
+    isRemoved:{
+        type: Boolean,
+        default: false
+    }
 
 });
-const Product = mongoose.model('Product', productSchema);
 
-const productValidation = (product) => {
+productSchema.statics.productValidation = (product) => {
     
     
     const schema = {
@@ -58,9 +62,27 @@ const productValidation = (product) => {
     return result;
 }
 
-const getRandomProducts = async (numberOfProducts) =>{
+
+productSchema.statics.findNotRemoved = async function (queryParams = {}, productsToSkip = 0, productLimit = 1){
+
+    let notRemovedQuery = {isRemoved: false}
+
+    notRemovedQuery = {...queryParams, ...notRemovedQuery}    
+
+    return await this.find(notRemovedQuery).skip(productsToSkip).limit(productLimit)
+}
+
+productSchema.statics.countNotRemoved = async function (){
     
-    const numberOfItemsInDb = await Product.countDocuments();
+    return await this.countDocuments({isRemoved: false});
+
+}
+
+productSchema.statics.getRandomProducts = async function (numberOfProducts){
+    
+    const numberOfItemsInDb = await this.countNotRemoved();
+     
+    if(numberOfItemsInDb===0) return {isEmpty: true}   
 
     let randomProducts = [];
     
@@ -69,7 +91,7 @@ const getRandomProducts = async (numberOfProducts) =>{
     let productsToSkip = Math.floor(Math.random()*(numberOfItemsInDb - numberOfProducts + 1));   
       
 
-    const productsFromDb = await Product.find().skip(productsToSkip).limit(numberOfProducts)
+    const productsFromDb = await this.findNotRemoved({} ,productsToSkip, numberOfProducts)
     
     productsFromDb.forEach( prod =>{
 
@@ -83,10 +105,13 @@ const getRandomProducts = async (numberOfProducts) =>{
     })
        
 
-    return randomProducts    
+    return {
+        products: randomProducts
+    }  
 }
 
-const getPagination = async (pageNumber, prodPerPage) =>{   
+
+productSchema.statics.getProductPagination = async function (pageNumber, prodPerPage){   
        
     let page = pageNumber || 1;
         
@@ -96,17 +121,19 @@ const getPagination = async (pageNumber, prodPerPage) =>{
     
     if(page<1) page = 1
         
-    const numberOfProd = await Product.countDocuments();
+    const numberOfProd = await this.countNotRemoved();
+
+    if (numberOfProd===0) return {isEmpty: true}         
 
     const lastPage = Math.ceil((numberOfProd/prodPerPage))
-
+    
     if(page>lastPage) page = lastPage    
 
     let prodsToSkip = prodPerPage*(page-1);    
 
     if (prodPerPage*page > numberOfProd) prodPerPage += numberOfProd - prodPerPage*page;
 
-    const productsFromDb = await Product.find().skip(prodsToSkip).limit(prodPerPage)
+    const productsFromDb = await this.findNotRemoved({} ,prodsToSkip, prodPerPage)
     const prodsToShow = [];
          
 
@@ -129,8 +156,4 @@ const getPagination = async (pageNumber, prodPerPage) =>{
     
 }
 
-
-module.exports.Product = Product;
-module.exports.productValidation = productValidation;
-module.exports.getRandomProducts = getRandomProducts;
-module.exports.getPagination = getPagination;
+module.exports = mongoose.model('Product', productSchema);

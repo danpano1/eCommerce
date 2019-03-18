@@ -1,43 +1,45 @@
 const express = require('express');
 const router = express.Router();
-const {Product, productValidation, getPagination} = require('../../models/Product');
+
+const Product = require('../../models/Product');
 const errorHandler = require('../middleware/errorHandler');
 
 
 router.get('/products', errorHandler(async (req, res)=>{
 
-    const pagination = await getPagination(req.query.page, 3);
+    const pagination = await Product.getProductPagination(req.query.page, 3);
 
     res.render('admin/products', {
         products: pagination.products,
         pages: pagination.lastPage,
         pagePath: '/admin/products',
         pageTitle: `Page ${pagination.currentPage}`,
-        currentPage: pagination.currentPage
+        currentPage: pagination.currentPage,
+        isEmpty: pagination.isEmpty
     })
 
 }))
 
 router.get('/products/:id', errorHandler((req, res)=>{
     
-    Product.findById(req.params.id)
+    Product.findNotRemoved({_id: req.params.id})
     .then((product)=>{
 
-        if(!product) return res.redirect('/admin')
+        if(!product[0]) return res.redirect('/admin/products')
         
         const productToShow = {
-            name: product.name,
-            price: product.price,
-            description: product.description,
-            imageURL: product.imageURL,
-            quantity: product.quantity,   
-            id: product._id            
+            name: product[0].name,
+            price: product[0].price,
+            description: product[0].description,
+            imageURL: product[0].imageURL,
+            quantity: product[0].quantity,   
+            id: product[0]._id            
         }
 
         res.render('admin/postProduct', {
             product: productToShow,   
             pagePath: '/admin/products',
-            pageTitle: product.name,            
+            pageTitle: product[0].name,            
         })
     })
     .catch((err)=>{
@@ -58,7 +60,7 @@ router.post('/products/:id', errorHandler(async (req, res)=>{
         id: req.body.id   
     }
 
-    const {error} = productValidation(req.body);
+    const {error} = Product.productValidation(req.body);
       
     
     if(error) return res.status(422).render('admin/postProduct', {
@@ -70,11 +72,11 @@ router.post('/products/:id', errorHandler(async (req, res)=>{
     
     
     let productToUpdate = await Product.findById(req.body.id)
-    const productWithTheSameName = await Product.findOne({name:req.body.name}) 
+    const productWithTheSameName = await Product.findNotRemoved({name:req.body.name}) 
     
 
-    if(productWithTheSameName) {
-        if (productWithTheSameName._id.toString() !== req.body.id){            
+    if(productWithTheSameName.length > 0) {
+        if (productWithTheSameName[0]._id.toString() !== req.body.id){            
             return res.status(422).render('admin/postProduct', {
                 pagePath: '/admin/products',
                 pageTitle: 'Add product',
@@ -113,7 +115,7 @@ router.post('/addproduct', errorHandler(async (req, res) =>{
         id: ""  
     }
 
-      const {error} = productValidation(req.body);
+      const {error} = Product.productValidation(req.body);
     
     if(error) return res.status(422).render('admin/postProduct', {
         pagePath: '/admin/addproduct',
@@ -122,7 +124,9 @@ router.post('/addproduct', errorHandler(async (req, res) =>{
         errs: error.details
     });
 
-    if(await Product.findOne({name:req.body.name})) return res.status(422).render('admin/postProduct', {
+    const productWithSameName = await Product.findNotRemoved({name: req.body.name})
+
+    if(productWithSameName.length > 0) return res.status(422).render('admin/postProduct', {
         pagePath: '/admin/addproduct',
         pageTitle: 'Add product',
         product: productDataFromUser,
@@ -159,10 +163,18 @@ router.post('/deleteproduct', errorHandler(async (req, res)=>{
 
     const productId = req.body.productID
 
-    await Product.findByIdAndDelete(productId)
+    const productToDelete = await Product.findById(productId)
+
+    productToDelete.isRemoved = true
+
+    await productToDelete.save()
 
     res.redirect(backURL)
 
 }))
+
+router.get('/orders', async (req, res)=>{
+   
+})
 
 module.exports = router;

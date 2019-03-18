@@ -5,7 +5,7 @@ block styles
 block content
         form.formContainer(action='/login' method='post')    
             label(for='email') E-mail
-            input.formInput(type='text' name='email')
+            input.formInput(type='text' name='email', value = mailFromUser)
             label(for='password') Password
             input.formInput(type='password' name='password')
             input(type="hidden", name="_csrf", value=csrfToken)
