@@ -48,33 +48,6 @@
     margin:5px;  
 }
 
-.pagination{
-    width: 500px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: row;
-    }
-
-.paginationButton{
-    margin: 5px;
-    height: 30px;
-    width: 30px;
-    outline: none;
-    border: none;
-    background-color: #44bf57;
-    border-radius: 50%;
-}
-
-.paginationArrow{
-    margin: 5px;
-    font-size: 20px;
- }
-
- .activePaginationButton{
-    background-color: #9c9c9c;
- }
 
  .buttonProductWrapper{
      display: flex;

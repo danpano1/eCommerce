@@ -105,7 +105,7 @@ orderSchema.methods.createOrderToken = function (cb){
 }
 
 
-orderSchema.statics.getOrderPagination = async function (pageNumber, ordersPerPage, querySettings = {}){
+orderSchema.statics.getOrderPagination = async function (pageNumber, ordersPerPage, querySettings = {}, sortSettings){
     let page = pageNumber || 1;
         
     if(isNaN(page)) page = 1
@@ -124,7 +124,7 @@ orderSchema.statics.getOrderPagination = async function (pageNumber, ordersPerPa
 
     if (ordersPerPage*page > numberOfOrders) ordersPerPage += numberOfOrders - ordersPerPage*page;
 
-    const ordersToShow = await this.getOrdersInfo(querySettings, ordersToSkip, ordersPerPage)
+    const ordersToShow = await this.getOrdersInfo(querySettings, ordersToSkip, ordersPerPage, sortSettings)
    
     return {
         orders: ordersToShow,
@@ -133,15 +133,15 @@ orderSchema.statics.getOrderPagination = async function (pageNumber, ordersPerPa
     }      
         
 }
-orderSchema.statics.getOrdersInfo = async function (queryOrderSettings = {}, ordersToSkip = 0, orderLimit = 1){
+orderSchema.statics.getOrdersInfo = async function (queryOrderSettings = {}, ordersToSkip = 0, orderLimit = 1, sortSettings){
         
     let ordersFromDb = [];
     let ordersFullInfo = [];
     let productsToFind = []; 
     let wholeOrderPrice = 0;   
     
-
-    ordersFromDb = await this.find(queryOrderSettings).skip(ordersToSkip).limit(orderLimit);
+    if(sortSettings) ordersFromDb = await this.find(queryOrderSettings).skip(ordersToSkip).limit(orderLimit).sort(sortSettings);
+    else ordersFromDb = await this.find(queryOrderSettings).skip(ordersToSkip).limit(orderLimit)    
 
     for (let i = 0; i<ordersFromDb.length; i++){
             
