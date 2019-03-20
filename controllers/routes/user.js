@@ -31,9 +31,7 @@ router.get('/myorders', errorHandler(async (req, res)=>{
        
     
     let orderPagination = await Order.getOrderPagination(req.query.page, 3, {userId: user.id}, '-orderDate') 
-    
-    console.log(orderPagination);
-
+        
     res.render('user/myorders', {
         pageTitle: "Your orders",
         pagePath: "/myorders",

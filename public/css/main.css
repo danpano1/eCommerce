@@ -149,3 +149,28 @@ body{
  .activePaginationButton{
     background-color: #9c9c9c;
  }
+
+ .searchInput{
+    margin: 10px;
+    width: 300px;
+    min-height: 30px;
+    border-radius: 5px;
+    border: none;
+    padding: 5px;
+    transition: background-color .5s;
+ }
+
+ .searchContainer{
+     display: flex;
+     flex-flow: row;
+     justify-content: center;
+     align-items: center;
+     margin: 20px 0;
+ }
+
+ 
+.buttonWrapper{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}

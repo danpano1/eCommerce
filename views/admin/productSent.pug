@@ -9,7 +9,7 @@ block content
             p.productName #{product.name}
             p.productPrice #{product.price}$
             p.productDestription #{product.description}
-            .buttonProductWrapper
+            .buttonWrapper
                 form(action="/admin/deleteproduct", method="post")
                     input(type="hidden", name="productID", value=product._id)
                     input(type="hidden", name="_csrf", value=csrfToken)

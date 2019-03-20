@@ -1,12 +1,27 @@
 extends ../layouts/mainLayout.pug
 block styles 
     link(rel="stylesheet", href="/css/order.css")
-block content       
-    if orders.length>0 
+block content
+    .searchContainer    
+        input.searchInput(type="search" placeholder="Search order by ID")
+        button.stdButton(id="searchButton") Search        
+    if notFound                          
+        .infoMsg
+            p There is no such orders
+            a(href="orders")
+                button.stdButton Back to orders  
+    else    
         each order in orders
             .orderContainer
+                if order.isSent
+                    .orderSendInfo.sent
+                        p Sent
+                else                    
+                    .orderSendInfo.notSent
+                        p Not sent
                 h3 #{order.orderDate}
                 h4 Order data
+                p ID: #{order.orderId}
                 p #{order.name} #{order.surname}
                 p #{order.email}
                 p #{order.postCode}, #{order.city} 
@@ -20,8 +35,59 @@ block content
                     .wholeValueContainer
                         p.wholeValueData Whole price
                         p.wholeValueData #{order.wholePrice}$
-                    a(href=`/invoices/${order.orderId}`)
-                        button.stdButton Invoice
-    else
-        .orderInfo
-            p There is no orders that are not sent
+                    .buttonWrapper
+                        a(href=`/invoices/${order.orderId}`)
+                            button.stdButton Invoice
+                        if !order.isSent
+                            form(action=`/admin/orders/makesent` method="post")
+                                input(type="hidden", name="_csrf", value=csrfToken)
+                                input(type="hidden", name="id", value = order.orderId)
+                                button.stdButton Change to sent
+        if orders.length > 1
+            .pagination        
+                if currentPage!==1
+                    a(href=`/admin/orders?page=${currentPage-1}`)
+                        i.fas.fa-angle-left.paginationArrow        
+                a(href=`/admin/orders?page=1`) 
+                    button.paginationButton(class=(currentPage===1 ? 'activePaginationButton' : '')) #{1} 
+                if pages > 1
+                    if pages <= 7 
+                        - var i = 2
+                        while (i<pages)
+                            a(href=`/admin/orders?page=${i}`) 
+                                button.paginationButton(class=(currentPage===i ? 'activePaginationButton' : '')) #{i} 
+                            - i++
+                    else                     
+                        if (currentPage>4 && currentPage<pages-3)
+                            span.dots ...
+                            - var i = 0
+                            while (i<5)
+                                a(href=`/admin/orders?page=${currentPage-2+i}`) 
+                                    button.paginationButton(class=(currentPage===currentPage-2+i ? 'activePaginationButton' : '')) #{currentPage-2+i}
+                                - i++
+                            span.dots ...
+                        else
+                            if (currentPage<=4)
+                                - var i = currentPage+1
+                                - var i2 = 2
+                                while (i>0)
+                                    a(href=`/admin/orders?page=${i2}`) 
+                                        button.paginationButton(class=(currentPage===i2 ? 'activePaginationButton' : '')) #{i2}                    
+                                    - i--
+                                    - i2++
+                                span.dots ...
+                            else
+                                span.dots ... 
+                                - var i = 2+pages-currentPage
+                                - var i2 = currentPage -2
+                                while (i>0)
+                                    a(href=`/admin/orders?page=${i2}`) 
+                                        button.paginationButton(class=(currentPage===i2 ? 'activePaginationButton' : '')) #{i2}                    
+                                    - i--
+                                    - i2++                    
+                    a(href=`/admin/orders?page=${pages}`) 
+                        button.paginationButton(class=(currentPage===pages ? 'activePaginationButton' : '')) #{pages}            
+                    if currentPage!==pages
+                        a(href=`/admin/orders?page=${currentPage+1}`)
+                            i.fas.fa-angle-right.paginationArrow
+    script(src='/js/searchById.js')

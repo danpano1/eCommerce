@@ -260,11 +260,16 @@ router.get('/invoices/:order', errorHandler((req, res)=>{
             if(!user) return res.redirect('/')
 
             Order.getOrdersInfo({_id: req.params.order})
-            .then(order=>{
+            .then(orders=>{
             
-                if(!order) return res.redirect('/')
+                if(!orders) return res.redirect('/')
+                
+                if(user.isAdmin === true) return createInvoicePdf(orders[0], res);
+               
+                if(user.id !== orders[0].userId) return res.redirect('/')
+                
 
-                createInvoicePdf(order[0], res);
+                createInvoicePdf(orders[0], res);
             })
             .catch(err=>{
                 res.redirect('/')

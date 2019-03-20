@@ -156,9 +156,11 @@ orderSchema.statics.getOrdersInfo = async function (queryOrderSettings = {}, ord
             city: ordersFromDb[i].city,
             streetAdress: ordersFromDb[i].streetAdress,
             country: ordersFromDb[i].country,
+            isSent: ordersFromDb[i].isSent,
+            userId: ordersFromDb[i].userId,
             products: []
         })   
-    
+        
         ordersFromDb[i].products.forEach(product =>{
     
             productsToFind.push(mongoose.Types.ObjectId(product.productId));

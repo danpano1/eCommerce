@@ -92,7 +92,7 @@ module.exports = async (order, res) => {
               },
               {
                 style: 'dataColumn',
-                text: `${prod.price*prod.quantity}`
+                text: `${prod.price*prod.quantity}$`
               },              
             ],          
           })     
@@ -129,7 +129,7 @@ module.exports = async (order, res) => {
         },
         {
             style: 'dataColumn',           
-            text: `${order.wholePrice}`            
+            text: `${order.wholePrice}$`            
         }
     ],
     },

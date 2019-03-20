@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const Product = require('../../models/Product');
+const Order = require('../../models/Order');
 const errorHandler = require('../middleware/errorHandler');
 
 
@@ -173,8 +174,59 @@ router.post('/deleteproduct', errorHandler(async (req, res)=>{
 
 }))
 
-router.get('/orders', async (req, res)=>{
+router.get('/orders', errorHandler(async (req, res)=>{
+    let ordersToShow = [];
+    let notFound = false;
+    let lastPage = 0;
+    let currentPage = 0;
+    
+    if(req.query.id){
+        idToFind = req.query.id
+        
+        try{
+            ordersToShow = await Order.getOrdersInfo({_id: req.query.id})
+        }
+        catch(err){
+            notFound = true
+        }
+        
+
+        if (ordersToShow.length === 0) notFound = true
+    }
+    else
+    {
+        const paginationToShow = await Order.getOrderPagination(req.query.page, 4, {}, 'isSent')
+
+        ordersToShow = paginationToShow.orders;
+        lastPage = paginationToShow.lastPage;
+        currentPage = paginationToShow.currentPage 
+    }
+
+
+
+    res.render('admin/orders', {
+        pagePath: '/admin/orders',
+        pageTitle: 'User orders',
+        orders: ordersToShow,
+        pages: lastPage,
+        currentPage: currentPage,
+        notFound: notFound
+    })
    
-})
+}))
+
+router.post('/orders/makesent', errorHandler(async (req, res)=>{
+    const backURL =  req.header('Referer');
+
+    const orderIdToChange = req.body.id;
+
+    const orderToChange = await Order.findById(orderIdToChange);
+
+    orderToChange.isSent = true;
+
+    await orderToChange.save();
+
+    res.redirect(backURL)
+}))
 
 module.exports = router;

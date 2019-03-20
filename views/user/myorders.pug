@@ -5,6 +5,12 @@ block content
     if orders.length>0 
         each order in orders
             .orderContainer
+                if order.isSent
+                    .orderSendInfo.sent
+                        p Sent
+                else                    
+                    .orderSendInfo.notSent
+                        p Not sent
                 h3 #{order.orderDate}
                 h4 Order data
                 p #{order.name} #{order.surname}
@@ -69,5 +75,5 @@ block content
                     a(href=`/myorders?page=${currentPage+1}`)
                         i.fas.fa-angle-right.paginationArrow    
     else
-        .orderInfo
+        .infoMsg
             p You have no orders.
