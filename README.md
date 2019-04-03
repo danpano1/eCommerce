@@ -14,6 +14,7 @@ Features:
   - Registration an log in stateless system
   - Hashing and comparing passwords
   - Admin and user routes that are protected
+  - Server side rendering
   - Stateless cart
   - Order system
   - User inputs server validation
