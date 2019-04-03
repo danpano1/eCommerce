@@ -15,6 +15,7 @@ Features:
   - Hashing and comparing passwords
   - Admin and user routes that are protected
   - Server side rendering
+  - Csrf forms protection
   - Stateless cart
   - Order system
   - User inputs server validation
